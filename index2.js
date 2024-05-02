@@ -1,15 +1,15 @@
 interact('.itemImg')
     .draggable({
         onstart: function (event) {
-            var target = event.target;
+            let target = event.target;
             // store the initial position and rotation angle of the item
             target.setAttribute('data-angle', parseFloat(target.getAttribute('data-angle')) || 0);
         },
         onmove: function (event) {
-            var target = event.target;
+            let target = event.target;
             // keep the dragged position in the data-x/data-y attributes
-            var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-            var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+            let x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+            let y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
 
             // translate the element
             target.style.webkitTransform =
@@ -33,8 +33,8 @@ interact('.itemImg')
 interact('.rotation-handle')
     .draggable({
         onstart: function (event) {
-            var box = event.target.parentElement;
-            var rect = box.getBoundingClientRect();
+            let box = event.target.parentElement;
+            let rect = box.getBoundingClientRect();
 
             // store the center as the element has css `transform-origin: center center`
             box.setAttribute('data-center-x', rect.left + rect.width / 2);
@@ -43,20 +43,20 @@ interact('.rotation-handle')
             box.setAttribute('data-angle', getDragAngle(event));
         },
         onmove: function (event) {
-            var box = event.target.parentElement;
+            let box = event.target.parentElement;
 
-            var pos = {
+            let pos = {
                 x: parseFloat(box.getAttribute('data-x')) || 0,
                 y: parseFloat(box.getAttribute('data-y')) || 0
             };
 
-            var angle = getDragAngle(event);
+            let angle = getDragAngle(event);
 
             // update transform style on dragmove
             box.style.transform = 'translate(' + pos.x + 'px, ' + pos.y + 'px) rotate(' + angle + 'rad' + ')';
         },
         onend: function (event) {
-            var box = event.target.parentElement;
+            let box = event.target.parentElement;
 
             // save the angle on dragend
             box.setAttribute('data-angle', getDragAngle(event));
@@ -64,29 +64,51 @@ interact('.rotation-handle')
     })
 
 function getDragAngle(event) {
-    var box = event.target.parentElement;
-    var startAngle = parseFloat(box.getAttribute('data-angle')) || 0;
-    var center = {
+    let box = event.target.parentElement;
+    let startAngle = parseFloat(box.getAttribute('data-angle')) || 0;
+    let center = {
         x: parseFloat(box.getAttribute('data-center-x')) || 0,
         y: parseFloat(box.getAttribute('data-center-y')) || 0
     };
-    var angle = Math.atan2(center.y - event.clientY,
+    let angle = Math.atan2(center.y - event.clientY,
         center.x - event.clientX);
 
     return angle - startAngle;
 }
+// manualStart: true
 interact('.itemImg')
-    .draggable({ manualStart: true })
+    .draggable({
+        onstart: function (event) {
+            let target = event.target;
+            // store the initial position and rotation angle of the item
+            target.setAttribute('data-angle', parseFloat(target.getAttribute('data-angle')) || 0);
+        },
+
+        onmove: function (event) {
+            let target = event.target;
+            // keep the dragged position in the data-x/data-y attributes
+            let x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+            let y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+            // translate the element
+            target.style.webkitTransform =
+                target.style.transform =
+                'translate(' + x + 'px, ' + y + 'px) rotate(' + target.getAttribute('data-angle') + 'rad)';
+
+            // update the position attributes
+            target.setAttribute('data-x', x);
+            target.setAttribute('data-y', y);
+        },
+    })
     .on('move', function (event) {
-        var interaction = event.interaction
+        let interaction = event.interaction
         let classes = event.currentTarget.classList;
         console.log(event.currentTarget.id);
         // if the pointer was moved while being held down
         // and an interaction hasn't started yet
         if (interaction.pointerIsDown && !interaction.interacting() && !classes.contains('green')) {
-            var original = event.currentTarget,
                 // create a clone of the currentTarget element
-                clone = event.currentTarget.cloneNode(true)
+                let clone = event.currentTarget.cloneNode(true)
 
             // insert the clone to the page
             // TODO: position the clone appropriately
@@ -102,23 +124,58 @@ interact('.dropzone')
     .dropzone({
         accept: '.itemImg',
         ondropactivate: function (event) {
-            //   event.target.classList.add('drop-active');
         },
         ondropdeactivate: function (event) {
-            //   event.target.classList.remove('drop-active');
         },
         ondragenter: function (event) {
             console.log(event)
+            let clone = event.dragEvent.currentTarget.cloneNode(true)
+            event.dragEvent.currentTarget.parentNode.removeChild(event.dragEvent.currentTarget);
 
-            // var draggableElement = event.relatedTarget;
-            // var dropzoneElement = event.target;
+            document.getElementById(`circuits`).appendChild(clone)
+            interact('.itemImg')
+            .draggable({
+                onstart: function (event) {
+                    let target = event.target;
+                    // store the initial position and rotation angle of the item
+                    target.setAttribute('data-angle', parseFloat(target.getAttribute('data-angle')) || 0);
+                },
+                onmove: function (event) {
+                    let target = event.target;
+                    // keep the dragged position in the data-x/data-y attributes
+                    let x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+                    let y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+        
+                    // translate the element
+                    target.style.webkitTransform =
+                        target.style.transform =
+                        'translate(' + x + 'px, ' + y + 'px) rotate(' + target.getAttribute('data-angle') + 'rad)';
+        
+                    // update the position attributes
+                    target.setAttribute('data-x', x);
+                    target.setAttribute('data-y', y);
+                },
+                inertia: true,
+                modifiers: [
+                    interact.modifiers.restrictRect({
+                        // restriction: 'parent',
+                        endOnly: true
+                    })
+                ],
+                autoScroll: true
+        
+            })
+        
+
+            // let draggableElement = event.relatedTarget;
+            // let dropzoneElement = event.target;
 
             // // Move draggable into drop zone
-            // var dropRect = dropzoneElement.getBoundingClientRect();
-            // var draggableRect = draggableElement.getBoundingClientRect();
+            // let dropRect = dropzoneElement.getBoundingClientRect();
+            // let draggableRect = draggableElement.getBoundingClientRect();
 
-            // var offsetX = dropRect.left - draggableRect.left;
-            // var offsetY = dropRect.top - draggableRect.top;
+            // let offsetX = dropRect.left - draggableRect.left;
+            // let offsetY = dropRect.top - draggableRect.top;
 
             // draggableElement.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
             // draggableElement.setAttribute('data-x', offsetX);
@@ -126,7 +183,7 @@ interact('.dropzone')
         },
         ondragleave: function (event) {
             // Reset draggable position if it leaves drop zone
-            // var draggableElement = event.relatedTarget;
+            // let draggableElement = event.relatedTarget;
             // draggableElement.style.transform = '';
             // draggableElement.setAttribute('data-x', '0');
             // draggableElement.setAttribute('data-y', '0');

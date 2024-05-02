@@ -57,6 +57,9 @@ article img {
     width: 100px;
     object-fit: cover;
 }
+.itemImg {
+    width: 100px;
+} 
 .rotator {
     padding: 30px 40px;
     display: table;
