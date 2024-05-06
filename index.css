@@ -59,6 +59,7 @@ article img {
 }
 .itemImg {
     width: 100px;
+    position: relative;
 } 
 .rotator {
     padding: 30px 40px;

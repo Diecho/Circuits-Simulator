@@ -4,13 +4,18 @@ interact('.itemImg')
             let target = event.target;
             // store the initial position and rotation angle of the item
             target.setAttribute('data-angle', parseFloat(target.getAttribute('data-angle')) || 0);
+            target.style.transform = "";
+            // target.setAttribute('data-x', 0);
+            // target.setAttribute('data-y', 0);
         },
         onmove: function (event) {
             let target = event.target;
             // keep the dragged position in the data-x/data-y attributes
             let x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
             let y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-
+            console.log(x,y)
+            console.log(event.dx, event.dy)
+            console.log(parseFloat(target.getAttribute('data-x')))
             // translate the element
             target.style.webkitTransform =
                 target.style.transform =
@@ -77,28 +82,12 @@ function getDragAngle(event) {
 }
 // manualStart: true
 interact('.itemImg')
-    .draggable({
-        onstart: function (event) {
-            let target = event.target;
-            // store the initial position and rotation angle of the item
-            target.setAttribute('data-angle', parseFloat(target.getAttribute('data-angle')) || 0);
-        },
+.draggable({
+    onstart: function (event) {
+    },
+    onmove: function (event) {
 
-        onmove: function (event) {
-            let target = event.target;
-            // keep the dragged position in the data-x/data-y attributes
-            let x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-            let y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-
-            // translate the element
-            target.style.webkitTransform =
-                target.style.transform =
-                'translate(' + x + 'px, ' + y + 'px) rotate(' + target.getAttribute('data-angle') + 'rad)';
-
-            // update the position attributes
-            target.setAttribute('data-x', x);
-            target.setAttribute('data-y', y);
-        },
+     }
     })
     .on('move', function (event) {
         let interaction = event.interaction
@@ -113,11 +102,12 @@ interact('.itemImg')
             // insert the clone to the page
             // TODO: position the clone appropriately
             console.log(clone);
-            clone.classList.add('green')
-            document.getElementById(`${event.currentTarget.parentNode.id}`).appendChild(clone)
+            event.currentTarget.classList.add('green')
+            event.currentTarget.innerHTML = `<div class="rotation-handle"><img src="rotatingArrow.svg" alt=""></div>` 
+            document.getElementById(`${event.currentTarget.parentNode.id}`).appendChild(clone);
 
             // start a drag interaction targeting the clone
-            interaction.start({ name: 'drag' }, event.interactable, clone)
+            // interaction.start({ name: 'drag' }, event.interactable, clone)
         }
     })
 interact('.dropzone')
