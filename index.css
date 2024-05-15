@@ -53,13 +53,12 @@ nav {
     height: 100%;
     width: 30%;
 }
-article img {
+
+.itemImg, .green {
     width: 100px;
+    /* position: ; */
+    touch-action: none;
     object-fit: cover;
-}
-.itemImg {
-    width: 100px;
-    position: relative;
 } 
 .rotator {
     padding: 30px 40px;

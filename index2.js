@@ -1,5 +1,3 @@
-// const { default: interact } = require("interactjs");
-
 function moveInteract(item){
     interact(item)
     .draggable({
@@ -19,6 +17,7 @@ function moveInteract(item){
             console.log(x,y)
             console.log(event.dx, event.dy)
             console.log(parseFloat(target.getAttribute('data-x')))
+            console.log(target)
             // translate the element
             target.style.webkitTransform =
                 target.style.transform =
@@ -111,9 +110,11 @@ interact('.itemImg') // cloning
             // insert the clone to the page
             // TODO: position the clone appropriately
             console.log(clone);
-            event.currentTarget.classList.add('green')
+            event.currentTarget.classList.add('green');
+            event.currentTarget.classList.remove('itemImg');
+
             // event.currentTarget.innerHTML = `<div class="rotation-handle"><img src="rotatingArrow.svg" alt=""></div>` 
-            // document.getElementById(`${event.currentTarget.parentNode.id}`).appendChild(clone);
+            // document].getElementById(`${event.currentTarget.parentNode.id}`).appendChild(clone);
 
             // start a drag interaction targeting the clone
             // interaction.start({ name: 'drag' }, event.interactable, clone)
@@ -121,21 +122,20 @@ interact('.itemImg') // cloning
     })
 interact('.dropzone')
     .dropzone({
-        accept: '.itemImg',
-        ondropactivate: function (event) {
-        },
-        ondropdeactivate: function (event) {
-        },
+        accept: '.green',
+        // ondropactivate: function (event) {
+        // },
+        // ondropdeactivate: function (event) {
+        // },
         ondragenter: function (event) {
-            interact(".itemImg").unset();
+            // interact(".itemImg").unset();
             console.log(event)
             let clone = event.dragEvent.currentTarget.cloneNode(true);
             event.dragEvent.currentTarget.parentNode.removeChild(event.dragEvent.currentTarget);
 
             document.getElementById(`circuits`).appendChild(clone);
 
-            moveInteract(".itemImg"); // add also clone making 
-
+            moveInteract(".green"); // add also clone making 
 
 
             // let draggableElement = event.relatedTarget;
