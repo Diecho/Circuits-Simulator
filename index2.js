@@ -1,3 +1,32 @@
+
+document.addEventListener(`DOMContentLoaded`, () => {
+
+    class Position {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+            this.empty = true;
+            this.block = "";
+            this.rotation = "";
+        }
+    }
+    let positionsArray = [];
+    function createPositionArray() {
+        for (let i = 10; i >= 1; i--) {
+            for (let e = 1; e <= 10; e++) {
+                positionsArray.push(new Position(e, i))
+            }
+        }
+    }
+    createPositionArray();
+    let htmlContentForCircuits = "";
+    for (position of positionsArray) {
+        htmlContentForCircuits = htmlContentForCircuits + `<div id="post${position.x}x-${position.y}y"></div>`
+    }
+    document.getElementById("circuits").innerHTML = htmlContentForCircuits;
+});
+
+
 function moveInteract(item, restrictionIs) {
     interact(item)
         .draggable({
@@ -27,7 +56,6 @@ function moveInteract(item, restrictionIs) {
                 target.setAttribute('data-x', x);
                 target.setAttribute('data-y', y);
             },
-            inertia: true,
             modifiers: [
                 interact.modifiers.restrictRect({
                     restriction: restrictionIs,
@@ -127,63 +155,47 @@ interact('.itemImg') // cloning
     })
 
 
-
-interact('.dropzone')
+let cat = 1;
+function drop(){
+    interact('.dropzone div')
     .dropzone({
         accept: '.green',
         ondropactivate: function (event) {
 
         },
         ondropdeactivate: function (event) {
-            console.log(event,event.relatedTarget)
-            const element = document.createElement("div")
+            console.log(event, event.draggable.target)
+            console.log("cac")
+            document.getElementById(event.currentTarget.id).appendChild(event.relatedTarget);
 
-            if(!event.relatedTarget.getAttribute('inside')){
-                event.dragEvent.currentTarget.parentNode.removeChild(event.dragEvent.currentTarget);  
-                element.classList.add("green");
-                element.innerHTML = ` <img src="${event.relatedTarget.src}">
-                <div class="rotation-handle"><img src="rotatingArrow.svg" alt=""></div>
-                `
-                document.getElementById(`circuits`).appendChild(element);
-
-                element.setAttribute('data-x', event._interaction._latestPointer.event.clientX -300);
-                element.setAttribute('data-y', event._interaction._latestPointer.event.clientY);    
-                console.log("caca", event.clientX, event._interaction._latestPointer.event.clientY, event._interaction._latestPointer.event.clientX)
-                element.style.webkitTransform =
-                element.style.transform =
-                `translate(${element.getAttribute("data-x")}px, ${element.getAttribute("data-y")}px)`;
-            }
-            element.setAttribute('inside', true);
+            event.relatedTarget.setAttribute('data-x', 0);
+            event.relatedTarget.setAttribute('data-y', 0);    
+            event.relatedTarget.style.webkitTransform =
+            event.relatedTarget.style.transform =
+            `translate(${event.relatedTarget.getAttribute("data-x")}px, ${event.relatedTarget.getAttribute("data-y")}px)`;
             interact(".green").unset();
 
-            moveInteract(".green", "parent"); // add also clone making 
+            moveInteract(".green"); // add also clone making 
+            let during = false;
+            let rotation = 0;
+            event.relatedTarget.addEventListener("dblclick", (event) => {
+                console.log(event)
+                if(during == false){
+                    rotation = rotation + 90;
+                    event.target.style.webkitTransform =
+                    event.target.style.transform =
+         `rotate(${rotation}deg)`
+                }
 
-            // moveInteract(".itemImg");
+            });
 
         },
         ondragenter: function (event) {
-            // interact(".itemImg").unset();
-
-            // let draggableElement = event.relatedTarget;
-            // let dropzoneElement = event.target;
-
-            // // Move draggable into drop zone
-            // let dropRect = dropzoneElement.getBoundingClientRect();
-            // let draggableRect = draggableElement.getBoundingClientRect();
-
-            // let offsetX = dropRect.left - draggableRect.left;
-            // let offsetY = dropRect.top - draggableRect.top;
-
-            // draggableElement.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
-            // draggableElement.setAttribute('data-x', offsetX);
-            // draggableElement.setAttribute('data-y', offsetY);
         },
         ondragleave: function (event) {
 
-            // Reset draggable position if it leaves drop zone
-            // let draggableElement = event.relatedTarget;
-            // draggableElement.style.transform = '';
-            // draggableElement.setAttribute('data-x', '0');
-            // draggableElement.setAttribute('data-y', '0');
         }
     });
+
+}
+drop();

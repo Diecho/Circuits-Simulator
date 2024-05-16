@@ -29,12 +29,7 @@ main {
     height: 90%;
     background-color: rgb(150, 217, 253);
 }
-#circuits {
-    flex-grow: 1;
-    border: 2px solid black;
-    position: relative;
-    /* box-sizing: content-box; */
-}
+
 nav article {
     display: flex;
     flex-flow: column-reverse;
@@ -67,7 +62,7 @@ nav {
     width: 100px;
 }
 .green {
-    background-color: green;
+    /* background-color: green; */
     position: absolute;
 }
 .rotator {
@@ -106,3 +101,22 @@ nav {
   .item {
     max-width: 200px;
   }
+#circuits {
+    display: flex;
+    flex-flow: row wrap;
+    aspect-ratio: 1 / 1;
+    border: 2px solid black;
+    position: relative;
+    /* box-sizing: content-box; */
+
+}
+#circuits div {
+    border: 1px solid black;
+    height: 10%;
+    aspect-ratio: 1 / 1;
+    position: relative;
+}
+#circuits div img {
+    height: 100%;
+    width: 100%;
+}
