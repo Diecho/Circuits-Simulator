@@ -1,46 +1,46 @@
-function moveInteract(item){
+function moveInteract(item, restrictionIs) {
     interact(item)
-    .draggable({
-        onstart: function (event) {
-            let target = event.target;
-            // store the initial position and rotation angle of the item
-            target.setAttribute('data-angle', parseFloat(target.getAttribute('data-angle')) || 0);
-            target.style.transform = "";
-            // target.setAttribute('data-x', 0);
-            // target.setAttribute('data-y', 0);
-        },
-        onmove: function (event) {
-            let target = event.target;
-            // keep the dragged position in the data-x/data-y attributes
-            let x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
-            let y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-            console.log(x,y)
-            console.log(event.dx, event.dy)
-            console.log(parseFloat(target.getAttribute('data-x')))
-            console.log(target)
-            // translate the element
-            target.style.webkitTransform =
-                target.style.transform =
-                'translate(' + x + 'px, ' + y + 'px) rotate(' + target.getAttribute('data-angle') + 'rad)';
+        .draggable({
+            onstart: function (event) {
+                let target = event.target;
+                // store the initial position and rotation angle of the item
+                target.setAttribute('data-angle', parseFloat(target.getAttribute('data-angle')) || 0);
+                target.style.transform = "";
+                // target.setAttribute('data-x', 0);
+                // target.setAttribute('data-y', 0);
+            },
+            onmove: function (event) {
+                let target = event.target;
+                // keep the dragged position in the data-x/data-y attributes
+                let x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+                let y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+                // console.log(x, y)
+                // console.log(event.dx, event.dy)
+                // console.log(parseFloat(target.getAttribute('data-x')))
+                // console.log(target)
+                // translate the element
+                target.style.webkitTransform =
+                    target.style.transform =
+                    'translate(' + x + 'px, ' + y + 'px) rotate(' + target.getAttribute('data-angle') + 'rad)';
 
-            // update the position attributes
-            target.setAttribute('data-x', x);
-            target.setAttribute('data-y', y);
-        },
-        inertia: true,
-        modifiers: [
-            interact.modifiers.restrictRect({
-                // restriction: 'parent',
-                endOnly: true
-            })
-        ],
-        autoScroll: true
+                // update the position attributes
+                target.setAttribute('data-x', x);
+                target.setAttribute('data-y', y);
+            },
+            inertia: true,
+            modifiers: [
+                interact.modifiers.restrictRect({
+                    restriction: restrictionIs,
+                    endOnly: true
+                })
+            ],
+            autoScroll: true
 
-    })
+        })
 
 }
 
-moveInteract(".itemImg");
+moveInteract(".itemImg", "none");
 
 
 interact('.rotation-handle')
@@ -90,12 +90,12 @@ function getDragAngle(event) {
 }
 // manualStart: true
 interact('.itemImg') // cloning
-.draggable({
-    onstart: function (event) {
-    },
-    onmove: function (event) {
+    .draggable({
+        onstart: function (event) {
+        },
+        onmove: function (event) {
 
-     }
+        }
     })
     .on('move', function (event) {
         let interaction = event.interaction
@@ -104,39 +104,65 @@ interact('.itemImg') // cloning
         // if the pointer was moved while being held down
         // and an interaction hasn't started yet
         if (interaction.pointerIsDown && !interaction.interacting() && !classes.contains('green')) {
-                // create a clone of the currentTarget element
-                let clone = event.currentTarget.cloneNode(true)
+            // create a clone of the currentTarget element
+            let clone = event.currentTarget.cloneNode(true)
 
             // insert the clone to the page
             // TODO: position the clone appropriately
-            console.log(clone);
             event.currentTarget.classList.add('green');
+            // interact(".itemImg").unset();
             event.currentTarget.classList.remove('itemImg');
+            event.currentTarget.removeAttribute('data-x');
+            event.currentTarget.removeAttribute('data-y');
+
+            event.currentTarget.setAttribute('data-x', 0);
+            event.currentTarget.setAttribute('data-y', 0);
 
             // event.currentTarget.innerHTML = `<div class="rotation-handle"><img src="rotatingArrow.svg" alt=""></div>` 
-            // document].getElementById(`${event.currentTarget.parentNode.id}`).appendChild(clone);
+            document.getElementById(`${event.currentTarget.parentNode.id}`).appendChild(clone);
 
             // start a drag interaction targeting the clone
-            // interaction.start({ name: 'drag' }, event.interactable, clone)
+            // interaction.start({ name: 'drag' }, event.interactable, event.currentTarget)
         }
     })
+
+
+
 interact('.dropzone')
     .dropzone({
         accept: '.green',
-        // ondropactivate: function (event) {
-        // },
-        // ondropdeactivate: function (event) {
-        // },
+        ondropactivate: function (event) {
+
+        },
+        ondropdeactivate: function (event) {
+            console.log(event,event.relatedTarget)
+            const element = document.createElement("div")
+
+            if(!event.relatedTarget.getAttribute('inside')){
+                event.dragEvent.currentTarget.parentNode.removeChild(event.dragEvent.currentTarget);  
+                element.classList.add("green");
+                element.innerHTML = ` <img src="${event.relatedTarget.src}">
+                <div class="rotation-handle"><img src="rotatingArrow.svg" alt=""></div>
+                `
+                document.getElementById(`circuits`).appendChild(element);
+
+                element.setAttribute('data-x', event._interaction._latestPointer.event.clientX -300);
+                element.setAttribute('data-y', event._interaction._latestPointer.event.clientY);    
+                console.log("caca", event.clientX, event._interaction._latestPointer.event.clientY, event._interaction._latestPointer.event.clientX)
+                element.style.webkitTransform =
+                element.style.transform =
+                `translate(${element.getAttribute("data-x")}px, ${element.getAttribute("data-y")}px)`;
+            }
+            element.setAttribute('inside', true);
+            interact(".green").unset();
+
+            moveInteract(".green", "parent"); // add also clone making 
+
+            // moveInteract(".itemImg");
+
+        },
         ondragenter: function (event) {
             // interact(".itemImg").unset();
-            console.log(event)
-            let clone = event.dragEvent.currentTarget.cloneNode(true);
-            event.dragEvent.currentTarget.parentNode.removeChild(event.dragEvent.currentTarget);
-
-            document.getElementById(`circuits`).appendChild(clone);
-
-            moveInteract(".green"); // add also clone making 
-
 
             // let draggableElement = event.relatedTarget;
             // let dropzoneElement = event.target;
@@ -153,6 +179,7 @@ interact('.dropzone')
             // draggableElement.setAttribute('data-y', offsetY);
         },
         ondragleave: function (event) {
+
             // Reset draggable position if it leaves drop zone
             // let draggableElement = event.relatedTarget;
             // draggableElement.style.transform = '';

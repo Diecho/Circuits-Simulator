@@ -32,6 +32,7 @@ main {
 #circuits {
     flex-grow: 1;
     border: 2px solid black;
+    position: relative;
     /* box-sizing: content-box; */
 }
 nav article {
@@ -56,10 +57,19 @@ nav {
 
 .itemImg, .green {
     width: 100px;
+    height:  100px;
     /* position: ; */
     touch-action: none;
     object-fit: cover;
 } 
+.green img {
+    object-fit: cover;
+    width: 100px;
+}
+.green {
+    background-color: green;
+    position: absolute;
+}
 .rotator {
     padding: 30px 40px;
     display: table;
