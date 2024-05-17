@@ -111,7 +111,7 @@ nav {
 
 }
 #circuits div {
-    border: 1px solid black;
+    border: 1px solid rgb(29, 19, 168);
     height: 10%;
     aspect-ratio: 1 / 1;
     position: relative;

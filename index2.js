@@ -6,8 +6,6 @@ document.addEventListener(`DOMContentLoaded`, () => {
             this.x = x;
             this.y = y;
             this.empty = true;
-            this.block = "";
-            this.rotation = "";
         }
     }
     let positionsArray = [];
@@ -22,8 +20,81 @@ document.addEventListener(`DOMContentLoaded`, () => {
     let htmlContentForCircuits = "";
     for (position of positionsArray) {
         htmlContentForCircuits = htmlContentForCircuits + `<div id="post${position.x}x-${position.y}y"></div>`
+
     }
     document.getElementById("circuits").innerHTML = htmlContentForCircuits;
+
+    for (position of positionsArray) {
+        document.getElementById(`post${position.x}x-${position.y}y`).setAttribute("data-x", position.x)
+        document.getElementById(`post${position.x}x-${position.y}y`).setAttribute("data-y", position.y)    
+    }
+    drop();
+
+    function drop(){
+
+        interact('.dropzone div')
+        .dropzone({
+            accept: '.green',
+            ondropactivate: function (event) {
+    
+            },
+            ondropdeactivate: function (event) {
+                console.log(event, event.draggable.target)
+                console.log("cac")
+                document.getElementById(event.currentTarget.id).appendChild(event.relatedTarget);
+                if (!event.currentTarget.getAttribute("empty")){
+                    console.log(!event.currentTarget.getAttribute("empty"))
+                    let during = false;
+                }
+                else {
+                }
+                for (position of positionsArray) {
+                    if(position.x == event.currentTarget.getAttribute("data-x") && position.y == event.currentTarget.getAttribute("data-y") && !event.currentTarget.getAttribute("empty") ){
+                        console.log(!position.empty, "hello im a cat")
+
+                        if(!position.empty){// == false
+                            console.log(!position.empty, "hello im a cat")
+                            event.relatedTarget.remove();
+                        }
+                        position.empty = false;
+                        console.log(event.currentTarget)
+                    }
+    
+                }
+            
+                event.currentTarget.setAttribute("empty", true)
+
+                event.relatedTarget.setAttribute('data-x', 0);
+                event.relatedTarget.setAttribute('data-y', 0);   
+                event.relatedTarget.style.webkitTransform =
+                event.relatedTarget.style.transform =
+                `translate(${event.relatedTarget.getAttribute("data-x")}px, ${event.relatedTarget.getAttribute("data-y")}px) rotate(${event.relatedTarget.getAttribute("data-angle")}deg)`;
+                interact(".green").unset();
+    
+                moveInteract(".green"); 
+                let rotation = 0;
+                event.relatedTarget.addEventListener("dblclick", (event) => {
+                    console.log(event)
+                    if(during == false){
+                        rotation = rotation + 90;
+                        event.target.style.webkitTransform =
+                        event.target.style.transform =
+             `rotate(${rotation}deg)`
+                    }
+                    event.target.setAttribute('data-angle', rotation || 0);
+                });
+                during = true;
+            },
+            ondragenter: function (event) {
+            },
+            ondragleave: function (event) {
+    
+            }
+        });
+    
+    }
+    
+
 });
 
 
@@ -50,7 +121,7 @@ function moveInteract(item, restrictionIs) {
                 // translate the element
                 target.style.webkitTransform =
                     target.style.transform =
-                    'translate(' + x + 'px, ' + y + 'px) rotate(' + target.getAttribute('data-angle') + 'rad)';
+                    'translate(' + x + 'px, ' + y + 'px) rotate(' + target.getAttribute('data-angle') + 'deg)';
 
                 // update the position attributes
                 target.setAttribute('data-x', x);
@@ -71,51 +142,6 @@ function moveInteract(item, restrictionIs) {
 moveInteract(".itemImg", "none");
 
 
-interact('.rotation-handle')
-    .draggable({
-        onstart: function (event) {
-            let box = event.target.parentElement;
-            let rect = box.getBoundingClientRect();
-
-            // store the center as the element has css `transform-origin: center center`
-            box.setAttribute('data-center-x', rect.left + rect.width / 2);
-            box.setAttribute('data-center-y', rect.top + rect.height / 2);
-            // get the angle of the element when the drag starts
-            box.setAttribute('data-angle', getDragAngle(event));
-        },
-        onmove: function (event) {
-            let box = event.target.parentElement;
-
-            let pos = {
-                x: parseFloat(box.getAttribute('data-x')) || 0,
-                y: parseFloat(box.getAttribute('data-y')) || 0
-            };
-
-            let angle = getDragAngle(event);
-
-            // update transform style on dragmove
-            box.style.transform = 'translate(' + pos.x + 'px, ' + pos.y + 'px) rotate(' + angle + 'rad' + ')';
-        },
-        onend: function (event) {
-            let box = event.target.parentElement;
-
-            // save the angle on dragend
-            box.setAttribute('data-angle', getDragAngle(event));
-        },
-    })
-
-function getDragAngle(event) {
-    let box = event.target.parentElement;
-    let startAngle = parseFloat(box.getAttribute('data-angle')) || 0;
-    let center = {
-        x: parseFloat(box.getAttribute('data-center-x')) || 0,
-        y: parseFloat(box.getAttribute('data-center-y')) || 0
-    };
-    let angle = Math.atan2(center.y - event.clientY,
-        center.x - event.clientX);
-
-    return angle - startAngle;
-}
 // manualStart: true
 interact('.itemImg') // cloning
     .draggable({
@@ -156,46 +182,3 @@ interact('.itemImg') // cloning
 
 
 let cat = 1;
-function drop(){
-    interact('.dropzone div')
-    .dropzone({
-        accept: '.green',
-        ondropactivate: function (event) {
-
-        },
-        ondropdeactivate: function (event) {
-            console.log(event, event.draggable.target)
-            console.log("cac")
-            document.getElementById(event.currentTarget.id).appendChild(event.relatedTarget);
-
-            event.relatedTarget.setAttribute('data-x', 0);
-            event.relatedTarget.setAttribute('data-y', 0);    
-            event.relatedTarget.style.webkitTransform =
-            event.relatedTarget.style.transform =
-            `translate(${event.relatedTarget.getAttribute("data-x")}px, ${event.relatedTarget.getAttribute("data-y")}px)`;
-            interact(".green").unset();
-
-            moveInteract(".green"); // add also clone making 
-            let during = false;
-            let rotation = 0;
-            event.relatedTarget.addEventListener("dblclick", (event) => {
-                console.log(event)
-                if(during == false){
-                    rotation = rotation + 90;
-                    event.target.style.webkitTransform =
-                    event.target.style.transform =
-         `rotate(${rotation}deg)`
-                }
-
-            });
-
-        },
-        ondragenter: function (event) {
-        },
-        ondragleave: function (event) {
-
-        }
-    });
-
-}
-drop();
