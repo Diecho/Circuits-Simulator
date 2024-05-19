@@ -116,6 +116,19 @@ nav {
     aspect-ratio: 1 / 1;
     position: relative;
 }
+#circuits div.connection-right {
+   border-right: red 1px solid; 
+}
+#circuits div.connection-left {
+    border-left: red 1px solid; 
+}
+#circuits div.connection-up {
+    border-top: red 1px solid; 
+}
+#circuits div.connection-down {
+    border-bottom: red 1px solid; 
+}
+
 #circuits div img {
     height: 100%;
     width: 100%;
