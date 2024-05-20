@@ -33,6 +33,7 @@ document.addEventListener(`DOMContentLoaded`, () => {
         document.getElementById(`post${position.x}x-${position.y}y`).setAttribute("connection-down", false)
         document.getElementById(`post${position.x}x-${position.y}y`).setAttribute("connection-right", false)
         document.getElementById(`post${position.x}x-${position.y}y`).setAttribute("connection-left", false)
+        document.getElementById(`post${position.x}x-${position.y}y`).setAttribute("connectionType", "none")
 
     }
     drop();
@@ -51,6 +52,10 @@ document.addEventListener(`DOMContentLoaded`, () => {
                     }
                     else {
                         document.getElementById(event.currentTarget.id).appendChild(event.relatedTarget);
+
+
+                        document.getElementById(`post${Number(event.currentTarget.getAttribute('data-x'))}x-${Number(event.currentTarget.getAttribute('data-y'))}y`).setAttribute("connectionType", event.relatedTarget.id)
+
 
                         console.log()
                         event.currentTarget.setAttribute("empty", false)
@@ -84,30 +89,36 @@ document.addEventListener(`DOMContentLoaded`, () => {
                         interact(".green").unset();
 
                         moveInteract(".green");
-                        let rotation = 0;
+                        let rotation = Number(event.target.getAttribute("data-angle"));
                         let during = false;
-                        event.relatedTarget.addEventListener("dblclick", (event) => {
-                            console.log(event)
-                            if (during == false) {
-                                during = true;
-                                rotation = rotation + 90;
-                                event.target.style.webkitTransform =
-                                    event.target.style.transform =
-                                    `rotate(${rotation}deg)`
-                            }
-                            event.target.setAttribute('data-angle', rotation || 0);
-                            during = false;
-                        });
+                        if(!(event.relatedTarget.getAttribute('listener') == "false")){
+                            event.relatedTarget.addEventListener("dblclick", (event) => {
+                                if (during == false) {
+                                    during = true;
+                                    rotation = Number(event.target.getAttribute("data-angle")) + .900001;
+                                    event.target.setAttribute('listener', false);
+    
+                                    event.target.setAttribute("data-angle", (rotation))
+                                    console.log(Math.floor(event.target.getAttribute("data-angle")));
+                                    event.target.style.webkitTransform =
+                                        event.target.style.transform =
+                                        `rotate(${Math.floor(event.target.getAttribute("data-angle"))}deg)`
+                                    // if ((Math.floor(event.target.getAttribute("data-angle")) % 90) == 0) {
+                                    //     event.target.setAttribute("data-angle", (Math.floor(event.target.getAttribute("data-angle"))))
+
+                                    // }
+                                }
+                                // event.target.setAttribute('data-angle', rotation || 0);
+                                during = false;
+                            });    
+                        }
                     }
                 },
                 ondragenter: function (event) {
                 },
                 ondragleave: function (event) {
-                    console.log("pene grito", event.currentTarget)
                     if (event.currentTarget == event.relatedTarget.parentNode) {
                         event.currentTarget.setAttribute("empty", true)
-
-
                         if (event.currentTarget.getAttribute("connection-up") == "true") {
                             event.currentTarget.setAttribute("connection-up", false);
                             document.getElementById(`post${Number(event.currentTarget.getAttribute('data-x'))}x-${Number(event.currentTarget.getAttribute('data-y')) + 1}y`).setAttribute("connection-down", false)
@@ -128,6 +139,9 @@ document.addEventListener(`DOMContentLoaded`, () => {
                             document.getElementById(`post${Number(event.currentTarget.getAttribute('data-x')) - 1}x-${Number(event.currentTarget.getAttribute('data-y'))}y`).setAttribute("connection-right", false)
                             console.log("desconected")
                         }
+                        document.getElementById(`post${Number(event.currentTarget.getAttribute('data-x'))}x-${Number(event.currentTarget.getAttribute('data-y'))}y`).setAttribute("connectionType", "none")
+                        event.target.parentNode.setAttribute("rotation", 0)
+
                         connectionsDetectorAnti()
                     }
                 }
@@ -135,6 +149,7 @@ document.addEventListener(`DOMContentLoaded`, () => {
 
     }
     let ConnectArr = ["connection-left", "connection-right", "connection-up", "connection-down"]
+
     function connectionsDetector() {
         for (const child of document.getElementById("circuits").children) {
             for (const iterator of ConnectArr) {
@@ -153,6 +168,24 @@ document.addEventListener(`DOMContentLoaded`, () => {
             }
         }
     }
+
+    let RealConnectArr = ["RealConnection-left", "RealConnection-right", "RealConnection-up", "RealConnection-down"]
+
+    function realConnectionsAdd() {
+        for (const child of document.getElementById("circuits").children) {
+            for (const iterator of RealConnectArr) {
+                switch (child.getAttribute("connectionType")) {
+                    case "wire":
+                        
+                        break;
+                
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+
 });
 
 function moveInteract(item, restrictionIs) {
