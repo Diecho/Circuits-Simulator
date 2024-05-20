@@ -34,6 +34,7 @@ document.addEventListener(`DOMContentLoaded`, () => {
         document.getElementById(`post${position.x}x-${position.y}y`).setAttribute("connection-right", false)
         document.getElementById(`post${position.x}x-${position.y}y`).setAttribute("connection-left", false)
         document.getElementById(`post${position.x}x-${position.y}y`).setAttribute("connectionType", "none")
+        document.getElementById(`post${position.x}x-${position.y}y`).setAttribute("rotation", 0)
 
     }
     drop();
@@ -80,9 +81,10 @@ document.addEventListener(`DOMContentLoaded`, () => {
                             console.log("conneted")
                         }
                         connectionsDetector()
-
                         event.relatedTarget.setAttribute('data-x', 0);
                         event.relatedTarget.setAttribute('data-y', 0);
+                        event.currentTarget.setAttribute("rotation", Math.floor(event.relatedTarget.getAttribute("data-angle")))
+
                         event.relatedTarget.style.webkitTransform =
                             event.relatedTarget.style.transform =
                             `translate(${event.relatedTarget.getAttribute("data-x")}px, ${event.relatedTarget.getAttribute("data-y")}px) rotate(${event.relatedTarget.getAttribute("data-angle")}deg)`;
@@ -91,27 +93,56 @@ document.addEventListener(`DOMContentLoaded`, () => {
                         moveInteract(".green");
                         let rotation = Number(event.target.getAttribute("data-angle"));
                         let during = false;
-                        if(!(event.relatedTarget.getAttribute('listener') == "false")){
+                        if (!(event.relatedTarget.getAttribute('listener') == "false")) {
                             event.relatedTarget.addEventListener("dblclick", (event) => {
                                 if (during == false) {
                                     during = true;
-                                    rotation = Number(event.target.getAttribute("data-angle")) + .900001;
                                     event.target.setAttribute('listener', false);
-    
+
+                                    rotation = Number(event.target.getAttribute("data-angle")) + .900001;
+                                    console.log(Math.floor(event.target.getAttribute("data-angle")) + 1 == 360, Math.floor(event.target.getAttribute("data-angle")) + 1)
+                                    if (Math.floor(event.target.getAttribute("data-angle")) + 1 == 360) {
+                                        rotation = 0;
+                                    }
+
                                     event.target.setAttribute("data-angle", (rotation))
-                                    console.log(Math.floor(event.target.getAttribute("data-angle")));
+                                    // console.log(Math.floor(event.target.getAttribute("data-angle")));
                                     event.target.style.webkitTransform =
                                         event.target.style.transform =
                                         `rotate(${Math.floor(event.target.getAttribute("data-angle"))}deg)`
-                                    // if ((Math.floor(event.target.getAttribute("data-angle")) % 90) == 0) {
-                                    //     event.target.setAttribute("data-angle", (Math.floor(event.target.getAttribute("data-angle"))))
+                                    event.target.parentNode.setAttribute("rotation", Math.floor(event.target.getAttribute("data-angle")))
+                                    if (event.target.parentNode.getAttribute("RealConnection-up") == "true") {
+                                        event.target.parentNode.setAttribute("RealConnection-up", false);
+                                        document.getElementById(`post${Number(event.target.parentNode.getAttribute('data-x'))}x-${Number(event.target.parentNode.getAttribute('data-y')) + 1}y`).setAttribute("RealConnection-down", false)
+                                        console.log("desconected")
+                                    }
+                                    if (event.target.parentNode.getAttribute("RealConnection-down") == "true") {
+                                        event.target.parentNode.setAttribute("RealConnection-down", false);
+                                        document.getElementById(`post${Number(event.target.parentNode.getAttribute('data-x'))}x-${Number(event.target.parentNode.getAttribute('data-y')) - 1}y`).setAttribute("RealConnection-up", false)
+                                        console.log("desconected")
+                                    }
+                                    if (event.target.parentNode.getAttribute("RealConnection-right") == "true") {
+                                        event.target.parentNode.setAttribute("RealConnection-right", false);
+                                        document.getElementById(`post${Number(event.target.parentNode.getAttribute('data-x')) + 1}x-${Number(event.target.parentNode.getAttribute('data-y'))}y`).setAttribute("RealConnection-left", false)
+                                        console.log("desconected")
+                                    }
+                                    if (event.target.parentNode.getAttribute("RealConnection-left") == "true") {
+                                        event.target.parentNode.setAttribute("RealConnection-left", false);
+                                        document.getElementById(`post${Number(event.target.parentNode.getAttribute('data-x')) - 1}x-${Number(event.target.parentNode.getAttribute('data-y'))}y`).setAttribute("RealConnection-right", false)
+                                        console.log("desconected")
+                                    }
+            
+                                    realConnectionsAdd(event.target.parentNode);
+                                    realConnectionsDetectorAnti();
 
-                                    // }
                                 }
                                 // event.target.setAttribute('data-angle', rotation || 0);
                                 during = false;
-                            });    
+                            });
                         }
+
+                        realConnectionsAdd(event.currentTarget);
+
                     }
                 },
                 ondragenter: function (event) {
@@ -140,20 +171,41 @@ document.addEventListener(`DOMContentLoaded`, () => {
                             console.log("desconected")
                         }
                         document.getElementById(`post${Number(event.currentTarget.getAttribute('data-x'))}x-${Number(event.currentTarget.getAttribute('data-y'))}y`).setAttribute("connectionType", "none")
-                        event.target.parentNode.setAttribute("rotation", 0)
+                        event.currentTarget.setAttribute("rotation", 0)
+                        if (event.currentTarget.getAttribute("RealConnection-up") == "true") {
+                            event.currentTarget.setAttribute("RealConnection-up", false);
+                            document.getElementById(`post${Number(event.currentTarget.getAttribute('data-x'))}x-${Number(event.currentTarget.getAttribute('data-y')) + 1}y`).setAttribute("RealConnection-down", false)
+                            console.log("desconected")
+                        }
+                        if (event.currentTarget.getAttribute("RealConnection-down") == "true") {
+                            event.currentTarget.setAttribute("RealConnection-down", false);
+                            document.getElementById(`post${Number(event.currentTarget.getAttribute('data-x'))}x-${Number(event.currentTarget.getAttribute('data-y')) - 1}y`).setAttribute("RealConnection-up", false)
+                            console.log("desconected")
+                        }
+                        if (event.currentTarget.getAttribute("RealConnection-right") == "true") {
+                            event.currentTarget.setAttribute("RealConnection-right", false);
+                            document.getElementById(`post${Number(event.currentTarget.getAttribute('data-x')) + 1}x-${Number(event.currentTarget.getAttribute('data-y'))}y`).setAttribute("RealConnection-left", false)
+                            console.log("desconected")
+                        }
+                        if (event.currentTarget.getAttribute("RealConnection-left") == "true") {
+                            event.currentTarget.setAttribute("RealConnection-left", false);
+                            document.getElementById(`post${Number(event.currentTarget.getAttribute('data-x')) - 1}x-${Number(event.currentTarget.getAttribute('data-y'))}y`).setAttribute("RealConnection-right", false)
+                            console.log("desconected")
+                        }
 
-                        connectionsDetectorAnti()
+                        connectionsDetectorAnti();
+                        realConnectionsDetectorAnti();
+                        
                     }
                 }
             });
 
     }
     let ConnectArr = ["connection-left", "connection-right", "connection-up", "connection-down"]
-
     function connectionsDetector() {
         for (const child of document.getElementById("circuits").children) {
             for (const iterator of ConnectArr) {
-                if(child.getAttribute(iterator) == "true") {
+                if (child.getAttribute(iterator) == "true") {
                     child.classList.add(iterator);
                 }
             }
@@ -162,7 +214,7 @@ document.addEventListener(`DOMContentLoaded`, () => {
     function connectionsDetectorAnti() {
         for (const child of document.getElementById("circuits").children) {
             for (const iterator of ConnectArr) {
-                if(child.getAttribute(iterator) == "false") {
+                if (child.getAttribute(iterator) == "false") {
                     child.classList.remove(iterator);
                 }
             }
@@ -171,20 +223,84 @@ document.addEventListener(`DOMContentLoaded`, () => {
 
     let RealConnectArr = ["RealConnection-left", "RealConnection-right", "RealConnection-up", "RealConnection-down"]
 
-    function realConnectionsAdd() {
+
+
+    function realConnectionsDetector() {
         for (const child of document.getElementById("circuits").children) {
             for (const iterator of RealConnectArr) {
-                switch (child.getAttribute("connectionType")) {
-                    case "wire":
-                        
-                        break;
-                
-                    default:
-                        break;
+                if (child.getAttribute(iterator) == "true") {
+                    child.classList.add(iterator);
                 }
             }
         }
     }
+    function realConnectionsDetectorAnti() {
+        for (const child of document.getElementById("circuits").children) {
+            for (const iterator of RealConnectArr) {
+                if (child.getAttribute(iterator) == "false") {
+                    child.classList.remove(iterator);
+                }
+            }
+        }
+    }
+
+    function realConnectionsAdd(child) {
+        console.log(child)
+        for (const realConnect of RealConnectArr) {
+            for (const connect of ConnectArr) {
+                if (child.getAttribute(connect) == "true" && RealConnectArr.indexOf(realConnect) == ConnectArr.indexOf(connect)) {
+                    console.log(child.getAttribute("connectionType"), realConnect)
+                    switch (child.getAttribute("connectionType")) {
+                        case "wire":
+                            switch (child.getAttribute("rotation")) {
+                                case "0":
+                                    if(realConnect == "RealConnection-left"){
+                                        child.setAttribute(realConnect, true);
+                                        if(document.getElementById(`post${Number(child.getAttribute('data-x')) - 1}x-${Number(child.getAttribute('data-y'))}y`).getAttribute("RealConnection-right") == "false"){
+                                            realConnectionsAdd(document.getElementById(`post${Number(child.getAttribute('data-x')) - 1}x-${Number(child.getAttribute('data-y'))}y`))
+                                        }// add real connections to the div to make it work the if 
+                                        // document.getElementById(`post${Number(child.getAttribute('data-x')) - 1}x-${Number(child.getAttribute('data-y'))}y`).setAttribute("RealConnection-right", true);
+                                    }
+                                    else if(realConnect == "RealConnection-right"){
+                                        child.setAttribute(realConnect, true);
+                                        if(document.getElementById(`post${Number(child.getAttribute('data-x')) + 1}x-${Number(child.getAttribute('data-y'))}y`) == false){
+                                            realConnectionsAdd(document.getElementById(`post${Number(child.getAttribute('data-x')) + 1}x-${Number(child.getAttribute('data-y'))}y`))
+                                        }
+
+                                        // document.getElementById(`post${Number(child.getAttribute('data-x')) + 1}x-${Number(child.getAttribute('data-y'))}y`).setAttribute("RealConnection-left", true);
+                                    }
+                                    console.log("real connected" , child.getAttribute("rotation"))
+                                    break;
+                                case "90":
+                                    console.log("caca" , child.getAttribute("rotation"))
+                                    break;
+                                case "180":
+                                    if(realConnect == "RealConnection-left"){
+                                        child.setAttribute(realConnect, true);
+                                        document.getElementById(`post${Number(child.getAttribute('data-x')) - 1}x-${Number(child.getAttribute('data-y'))}y`).setAttribute("RealConnection-right", true);
+                                    }
+                                    else if(realConnect == "RealConnection-right"){
+                                        child.setAttribute(realConnect, true);
+                                        document.getElementById(`post${Number(child.getAttribute('data-x')) + 1}x-${Number(child.getAttribute('data-y'))}y`).setAttribute("RealConnection-left", true);
+                                    }
+                                    break;
+                                case 270:
+        
+                                    break;
+                            }
+                            break;
+        
+                        default:
+                            break;
+                    }
+
+                }
+            }
+
+        }
+        realConnectionsDetector();
+    }
+
 
 });
 

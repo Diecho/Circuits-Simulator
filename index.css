@@ -128,7 +128,19 @@ nav {
 #circuits div.connection-down {
     border-bottom: red 1px solid; 
 }
-
+#circuits div.RealConnection-right {
+    border-right: rgb(0, 255, 0) 1px solid; 
+ }
+ #circuits div.RealConnection-left {
+     border-left: rgb(0, 255, 0) 1px solid; 
+ }
+ #circuits div.RealConnection-up {
+     border-top: rgb(0, 255, 0) 1px solid; 
+ }
+ #circuits div.RealConnection-down {
+     border-bottom: rgb(0, 255, 0) 1px solid; 
+ }
+ 
 #circuits div img {
     height: 100%;
     width: 100%;
