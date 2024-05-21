@@ -52,13 +52,20 @@ document.addEventListener(`DOMContentLoaded`, () => {
             .dropzone({
                 accept: '.green',
                 ondropactivate: function (event) {
-                    console.log("c")
                 },
                 ondropdeactivate: function (event) {
                     if (event.currentTarget == null || event.currentTarget.childElementCount == 2) {
                         event.relatedTarget.remove();
                     }
                     else {
+                        switch (event.relatedTarget.id) {
+                            case "resistor":
+                                event.currentTarget.setAttribute("resistance", 5);
+                                break;
+                            case "battery":
+                                event.currentTarget.setAttribute("voltage", 10);
+                                break;
+                        }
                         document.getElementById(event.currentTarget.id).appendChild(event.relatedTarget);
 
 
@@ -69,22 +76,18 @@ document.addEventListener(`DOMContentLoaded`, () => {
                         if (document.getElementById(`post${Number(event.currentTarget.getAttribute('data-x'))}x-${Number(event.currentTarget.getAttribute('data-y')) + 1}y`).getAttribute("empty") == "false") {
                             event.currentTarget.setAttribute("connection-up", true)
                             document.getElementById(`post${Number(event.currentTarget.getAttribute('data-x'))}x-${Number(event.currentTarget.getAttribute('data-y')) + 1}y`).setAttribute("connection-down", true)
-                            console.log("conneted")
                         }
                         if (document.getElementById(`post${Number(event.currentTarget.getAttribute('data-x'))}x-${Number(event.currentTarget.getAttribute('data-y')) - 1}y`).getAttribute("empty") == "false") {
                             event.currentTarget.setAttribute("connection-down", true)
                             document.getElementById(`post${Number(event.currentTarget.getAttribute('data-x'))}x-${Number(event.currentTarget.getAttribute('data-y')) - 1}y`).setAttribute("connection-up", true)
-                            console.log("conneted")
                         }
                         if (document.getElementById(`post${Number(event.currentTarget.getAttribute('data-x')) + 1}x-${Number(event.currentTarget.getAttribute('data-y'))}y`).getAttribute("empty") == "false") {
                             event.currentTarget.setAttribute("connection-right", true)
                             document.getElementById(`post${Number(event.currentTarget.getAttribute('data-x')) + 1}x-${Number(event.currentTarget.getAttribute('data-y'))}y`).setAttribute("connection-left", true)
-                            console.log("conneted")
                         }
                         if (document.getElementById(`post${Number(event.currentTarget.getAttribute('data-x')) - 1}x-${Number(event.currentTarget.getAttribute('data-y'))}y`).getAttribute("empty") == "false") {
                             event.currentTarget.setAttribute("connection-left", true)
                             document.getElementById(`post${Number(event.currentTarget.getAttribute('data-x')) - 1}x-${Number(event.currentTarget.getAttribute('data-y'))}y`).setAttribute("connection-right", true)
-                            console.log("conneted")
                         }
                         connectionsDetector()
                         event.relatedTarget.setAttribute('data-x', 0);
@@ -100,16 +103,17 @@ document.addEventListener(`DOMContentLoaded`, () => {
                         let rotation = Number(event.target.getAttribute("data-angle"));
                         let during = false;
                         if (!(event.relatedTarget.getAttribute('listener') == "false")) {
+                            event.relatedTarget.setAttribute('listener', false);
+                            console.log("createddd")
                             event.relatedTarget.addEventListener("dblclick", (event) => {
                                 if (during == false) {
                                     during = true;
-                                    event.target.setAttribute('listener', false);
 
-                                    rotation = Number(event.target.getAttribute("data-angle")) + .90000;
-                                    console.log(Math.floor(event.target.getAttribute("data-angle")) + 1 == 360, Math.floor(event.target.getAttribute("data-angle")) + 1)
-                                    if (Math.floor(event.target.getAttribute("data-angle")) + 1 == 360) {
+                                    rotation = Number(event.target.getAttribute("data-angle")) + 90;
+                                    if (Math.floor(event.target.getAttribute("data-angle")) == 270) {
                                         rotation = 0;
                                     }
+                                    console.log(Math.floor(event.target.getAttribute("data-angle")) == 270, Math.floor(event.target.getAttribute("data-angle")))
 
                                     event.target.setAttribute("data-angle", (rotation))
                                     // console.log(Math.floor(event.target.getAttribute("data-angle")));
@@ -145,9 +149,77 @@ document.addEventListener(`DOMContentLoaded`, () => {
                                 // event.target.setAttribute('data-angle', rotation || 0);
                                 during = false;
                             });
+
+
+                        }
+                        if (!(event.relatedTarget.getAttribute('listenerForClick') == "false")) {
+                            event.relatedTarget.setAttribute('listenerForClick', false);
+                            event.relatedTarget.addEventListener("click", (event) => {
+                                if (event.detail === 1) {
+                                    console.log("clickiiiy", event)
+                                    switch (event.target.id) {
+                                        case "resistor":
+                                            document.getElementById("aside").innerHTML =
+                                                `
+                                                <h3>${event.target.id.toUpperCase()}</h3>
+                                                <p>Actual resistance: ${event.target.parentNode.getAttribute("resistance")}</p>
+                                                <input type="text" placeholder="Resistance">
+                                                <button id="change">Change</button>                                
+                                                `
+                                            break;
+                                        case "battery":
+                                            document.getElementById("aside").innerHTML =
+                                                `
+                                                <h3>${event.target.id.toUpperCase()}</h3>
+                                                <p>Actual voltage: ${event.target.parentNode.getAttribute("voltage")}</p>
+                                                <input type="text" placeholder="Volts">
+                                                <button id="change">Change</button>                                
+                                                `
+                                            break;
+                                        case "wire":
+                                        case "wireCross":
+                                        case "wireT":
+                                        case "wireCurve":
+
+                                            document.getElementById("aside").innerHTML =
+                                                `
+                                                <h3>${event.target.id.toUpperCase()}</h3>
+                                                <p>Actual current: ${event.target.parentNode.getAttribute("current") || "none"}</p>
+                                                `
+                                            break;
+                                        case "resistor":
+                                            document.getElementById("aside").innerHTML =
+                                                `
+                                                <h3>${event.target.id.toUpperCase()}</h3>
+                                                <input type="text" placeholder="resistance">
+                                                <button id="change">Change</button>                                
+                                                `
+                                            break;
+
+                                        default:
+                                            break;
+                                    }
+                                    document.getElementById("aside").classList.remove("displayNone");
+                                    document.getElementById("header").classList.add("displayNone");
+
+
+                                }
+
+
+
+                            });
                         }
 
                         realConnectionsAdd(event.currentTarget);
+
+                        if (!(event.currentTarget.getAttribute('circuitsDetect') == "false")) {
+                            event.currentTarget.setAttribute('circuitsDetect', false);
+
+                            circuitsDetector();
+                        }
+
+
+
 
                     }
                 },
@@ -199,6 +271,7 @@ document.addEventListener(`DOMContentLoaded`, () => {
                             console.log("desconected")
                         }
                         event.target.parentNode.setAttribute("realConnection-count", 0)
+                        event.target.parentNode.setAttribute('circuitsDetect', true);
 
                         connectionsDetectorAnti();
                         realConnectionsDetectorAnti();
@@ -227,8 +300,48 @@ document.addEventListener(`DOMContentLoaded`, () => {
             }
         }
     }
-
     let RealConnectArr = ["RealConnection-left", "RealConnection-right", "RealConnection-up", "RealConnection-down"]
+    let circuitsArray = [];
+    function circuitsDetector() {
+        for (const div of document.getElementById("circuits").children) {
+            if (div.getAttribute("connectiontype") == "battery") {
+                console.log("batteryFOunded")
+                for (const connecttion of RealConnectArr) {
+                    if (div.getAttribute(connecttion) == "true") {
+                        circuitsArray.push({ battery: Number(div.getAttribute("voltage")) })
+                        console.log(circuitsArray)
+                        console.log(connecttion)
+                        repetionCircuits(div, connecttion);
+                    }
+                }
+            }
+        }
+    }
+    function repetionCircuits(div, connecttion){
+        switch (div.getAttribute(connecttion)) {
+            case "RealConnection-left":
+                let element1 = document.getElementById(`post${Number(div.getAttribute('data-x')) - 1}x-${Number(div.getAttribute('data-y'))}y`);
+                if(element1getAttribute("connectiontype") == "wire"){
+                    repetionCircuits(element1, connecttion);//???
+                }
+                break;
+            case "RealConnection-right":
+                let element2 = document.getElementById(`post${Number(div.getAttribute('data-x')) + 1}x-${Number(div.getAttribute('data-y'))}y`);
+
+                break;
+            case "RealConnection-up":
+                let element3 = document.getElementById(`post${Number(div.getAttribute('data-x'))}x-${Number(div.getAttribute('data-y')) + 1}}y`);
+
+                break;
+            case "RealConnection-down":
+                let element4 = document.getElementById(`post${Number(div.getAttribute('data-x'))}x-${Number(div.getAttribute('data-y')) - 1}}y`);
+
+                break;
+
+        }
+
+    }
+
 
 
 
@@ -282,11 +395,9 @@ document.addEventListener(`DOMContentLoaded`, () => {
 
 
     function realConnectionsAdd(child) {
-        console.log(child)
         for (const realConnect of RealConnectArr) {
             for (const connect of ConnectArr) {
                 if (child.getAttribute(connect) == "true" && RealConnectArr.indexOf(realConnect) == ConnectArr.indexOf(connect)) {
-                    console.log(child.getAttribute("connectionType"), realConnect)
                     switch (child.getAttribute("connectionType")) {
                         case "wire":
                         case "battery":
@@ -294,6 +405,7 @@ document.addEventListener(`DOMContentLoaded`, () => {
                         case "anmeter":
                         case "voltmeter":
                         case "resistor":
+                        case "closedSwitch":
                             switch (child.getAttribute("rotation")) {
                                 case "0":
                                 case "180":
@@ -474,7 +586,6 @@ document.addEventListener(`DOMContentLoaded`, () => {
                         default:
                             break;
                     }
-                    console.log(child.getAttribute("realConnection-count"))
                 }
                 else {
                 }
