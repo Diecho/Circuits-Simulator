@@ -35,6 +35,13 @@ document.addEventListener(`DOMContentLoaded`, () => {
         document.getElementById(`post${position.x}x-${position.y}y`).setAttribute("connection-left", false)
         document.getElementById(`post${position.x}x-${position.y}y`).setAttribute("connectionType", "none")
         document.getElementById(`post${position.x}x-${position.y}y`).setAttribute("rotation", 0)
+        document.getElementById(`post${position.x}x-${position.y}y`).setAttribute("RealConnection-up", false)
+        document.getElementById(`post${position.x}x-${position.y}y`).setAttribute("RealConnection-down", false)
+        document.getElementById(`post${position.x}x-${position.y}y`).setAttribute("RealConnection-right", false)
+        document.getElementById(`post${position.x}x-${position.y}y`).setAttribute("RealConnection-left", false)
+        document.getElementById(`post${position.x}x-${position.y}y`).setAttribute("RealConnection-left", false)
+        document.getElementById(`post${position.x}x-${position.y}y`).setAttribute("realConnection-count", 0)
+
 
     }
     drop();
@@ -56,7 +63,6 @@ document.addEventListener(`DOMContentLoaded`, () => {
 
 
                         document.getElementById(`post${Number(event.currentTarget.getAttribute('data-x'))}x-${Number(event.currentTarget.getAttribute('data-y'))}y`).setAttribute("connectionType", event.relatedTarget.id)
-
 
                         console.log()
                         event.currentTarget.setAttribute("empty", false)
@@ -99,7 +105,7 @@ document.addEventListener(`DOMContentLoaded`, () => {
                                     during = true;
                                     event.target.setAttribute('listener', false);
 
-                                    rotation = Number(event.target.getAttribute("data-angle")) + .900001;
+                                    rotation = Number(event.target.getAttribute("data-angle")) + .90000;
                                     console.log(Math.floor(event.target.getAttribute("data-angle")) + 1 == 360, Math.floor(event.target.getAttribute("data-angle")) + 1)
                                     if (Math.floor(event.target.getAttribute("data-angle")) + 1 == 360) {
                                         rotation = 0;
@@ -131,7 +137,7 @@ document.addEventListener(`DOMContentLoaded`, () => {
                                         document.getElementById(`post${Number(event.target.parentNode.getAttribute('data-x')) - 1}x-${Number(event.target.parentNode.getAttribute('data-y'))}y`).setAttribute("RealConnection-right", false)
                                         console.log("desconected")
                                     }
-            
+
                                     realConnectionsAdd(event.target.parentNode);
                                     realConnectionsDetectorAnti();
 
@@ -192,10 +198,11 @@ document.addEventListener(`DOMContentLoaded`, () => {
                             document.getElementById(`post${Number(event.currentTarget.getAttribute('data-x')) - 1}x-${Number(event.currentTarget.getAttribute('data-y'))}y`).setAttribute("RealConnection-right", false)
                             console.log("desconected")
                         }
+                        event.target.parentNode.setAttribute("realConnection-count", 0)
 
                         connectionsDetectorAnti();
                         realConnectionsDetectorAnti();
-                        
+
                     }
                 }
             });
@@ -244,6 +251,36 @@ document.addEventListener(`DOMContentLoaded`, () => {
         }
     }
 
+    function realConnectLeft(child, realConnect) {
+        child.setAttribute(realConnect, true);
+        if (document.getElementById(`post${Number(child.getAttribute('data-x')) - 1}x-${Number(child.getAttribute('data-y'))}y`).getAttribute("RealConnection-right") == "false") {
+            document.getElementById(`post${Number(child.getAttribute('data-x')) - 1}x-${Number(child.getAttribute('data-y'))}y`).setAttribute("realConnection-count", realConnect)
+            realConnectionsAdd(document.getElementById(`post${Number(child.getAttribute('data-x')) - 1}x-${Number(child.getAttribute('data-y'))}y`))
+        }
+    }
+    function realConnectRight(child, realConnect) {
+        child.setAttribute(realConnect, true);
+        if (document.getElementById(`post${Number(child.getAttribute('data-x')) + 1}x-${Number(child.getAttribute('data-y'))}y`).getAttribute("RealConnection-left") == "false") {
+            document.getElementById(`post${Number(child.getAttribute('data-x')) + 1}x-${Number(child.getAttribute('data-y'))}y`).setAttribute("realConnection-count", realConnect)
+            realConnectionsAdd(document.getElementById(`post${Number(child.getAttribute('data-x')) + 1}x-${Number(child.getAttribute('data-y'))}y`))
+        }
+    }
+    function realConnectUp(child, realConnect) {
+        child.setAttribute(realConnect, true);
+        if (document.getElementById(`post${Number(child.getAttribute('data-x'))}x-${Number(child.getAttribute('data-y')) + 1}y`).getAttribute("RealConnection-down") == "false") {
+            document.getElementById(`post${Number(child.getAttribute('data-x'))}x-${Number(child.getAttribute('data-y')) + 1}y`).setAttribute("realConnection-count", realConnect)
+            realConnectionsAdd(document.getElementById(`post${Number(child.getAttribute('data-x'))}x-${Number(child.getAttribute('data-y')) + 1}y`))
+        }
+    }
+    function realConnectDown(child, realConnect) {
+        child.setAttribute(realConnect, true);
+        if (document.getElementById(`post${Number(child.getAttribute('data-x'))}x-${Number(child.getAttribute('data-y')) - 1}y`).getAttribute("RealConnection-up") == "false") {
+            document.getElementById(`post${Number(child.getAttribute('data-x'))}x-${Number(child.getAttribute('data-y')) - 1}y`).setAttribute("realConnection-count", realConnect)
+            realConnectionsAdd(document.getElementById(`post${Number(child.getAttribute('data-x'))}x-${Number(child.getAttribute('data-y')) - 1}y`))
+        }
+    }
+
+
     function realConnectionsAdd(child) {
         console.log(child)
         for (const realConnect of RealConnectArr) {
@@ -252,48 +289,194 @@ document.addEventListener(`DOMContentLoaded`, () => {
                     console.log(child.getAttribute("connectionType"), realConnect)
                     switch (child.getAttribute("connectionType")) {
                         case "wire":
+                        case "battery":
+                        case "inductor":
+                        case "anmeter":
+                        case "voltmeter":
+                        case "resistor":
                             switch (child.getAttribute("rotation")) {
                                 case "0":
-                                    if(realConnect == "RealConnection-left"){
-                                        child.setAttribute(realConnect, true);
-                                        if(document.getElementById(`post${Number(child.getAttribute('data-x')) - 1}x-${Number(child.getAttribute('data-y'))}y`).getAttribute("RealConnection-right") == "false"){
-                                            realConnectionsAdd(document.getElementById(`post${Number(child.getAttribute('data-x')) - 1}x-${Number(child.getAttribute('data-y'))}y`))
-                                        }// add real connections to the div to make it work the if 
-                                        // document.getElementById(`post${Number(child.getAttribute('data-x')) - 1}x-${Number(child.getAttribute('data-y'))}y`).setAttribute("RealConnection-right", true);
+                                case "180":
+                                    if (realConnect == "RealConnection-left") {
+                                        realConnectLeft(child, realConnect);
                                     }
-                                    else if(realConnect == "RealConnection-right"){
-                                        child.setAttribute(realConnect, true);
-                                        if(document.getElementById(`post${Number(child.getAttribute('data-x')) + 1}x-${Number(child.getAttribute('data-y'))}y`) == false){
-                                            realConnectionsAdd(document.getElementById(`post${Number(child.getAttribute('data-x')) + 1}x-${Number(child.getAttribute('data-y'))}y`))
-                                        }
-
-                                        // document.getElementById(`post${Number(child.getAttribute('data-x')) + 1}x-${Number(child.getAttribute('data-y'))}y`).setAttribute("RealConnection-left", true);
+                                    else if (realConnect == "RealConnection-right") {
+                                        realConnectRight(child, realConnect);
                                     }
-                                    console.log("real connected" , child.getAttribute("rotation"))
+                                    else {
+                                        realCount(child);
+                                    }
                                     break;
                                 case "90":
-                                    console.log("caca" , child.getAttribute("rotation"))
-                                    break;
-                                case "180":
-                                    if(realConnect == "RealConnection-left"){
-                                        child.setAttribute(realConnect, true);
-                                        document.getElementById(`post${Number(child.getAttribute('data-x')) - 1}x-${Number(child.getAttribute('data-y'))}y`).setAttribute("RealConnection-right", true);
+                                case "270":
+                                    if (realConnect == "RealConnection-down") {
+                                        realConnectDown(child, realConnect);
                                     }
-                                    else if(realConnect == "RealConnection-right"){
-                                        child.setAttribute(realConnect, true);
-                                        document.getElementById(`post${Number(child.getAttribute('data-x')) + 1}x-${Number(child.getAttribute('data-y'))}y`).setAttribute("RealConnection-left", true);
+                                    else if (realConnect == "RealConnection-up") {
+                                        realConnectUp(child, realConnect);
                                     }
-                                    break;
-                                case 270:
-        
+                                    else {
+                                        realCount(child);
+                                    }
                                     break;
                             }
                             break;
-        
+                        case "wireCurve":
+                            switch (child.getAttribute("rotation")) {
+                                case "0":
+                                    if (realConnect == "RealConnection-down") {
+                                        realConnectDown(child, realConnect);
+                                    }
+                                    if (realConnect == "RealConnection-right") {
+                                        realConnectRight(child, realConnect);
+                                    }
+                                    if (realConnect == "RealConnection-down") {
+                                    }
+                                    else if (realConnect == "RealConnection-right") {
+                                    }
+                                    else {
+                                        realCount(child);
+                                    }
+
+                                    break;
+                                case "90":
+                                    if (realConnect == "RealConnection-down") {
+                                        realConnectDown(child, realConnect);
+                                    }
+                                    if (realConnect == "RealConnection-left") {
+                                        realConnectLeft(child, realConnect);
+                                    }
+                                    if (realConnect == "RealConnection-right" || realConnect == "RealConnection-up") {
+                                        realCount(child);
+                                    }
+
+                                    break;
+                                case "180":
+                                    if (realConnect == "RealConnection-up") {
+                                        realConnectUp(child, realConnect);
+                                    }
+                                    if (realConnect == "RealConnection-left") {
+                                        realConnectLeft(child, realConnect);
+                                    }
+                                    if (realConnect == "RealConnection-right" || realConnect == "RealConnection-down") {
+                                        realCount(child);
+                                    }
+                                    break;
+
+                                case "270":
+                                    if (realConnect == "RealConnection-up") {
+                                        realConnectUp(child, realConnect);
+                                    }
+                                    if (realConnect == "RealConnection-right") {
+                                        realConnectRight(child, realConnect);
+                                    }
+                                    if (realConnect == "RealConnection-left" || realConnect == "RealConnection-down") {
+                                        realCount(child);
+                                    }
+                                    break;
+                                    ;
+                            }
+                            break;
+                        case "wireT":
+                            switch (child.getAttribute("rotation")) {
+                                case "0":
+                                    if (realConnect == "RealConnection-up") {
+                                        realConnectUp(child, realConnect);
+                                    }
+                                    if (realConnect == "RealConnection-right") {
+                                        realConnectRight(child, realConnect);
+                                    }
+                                    if (realConnect == "RealConnection-left") {
+                                        realConnectLeft(child, realConnect);
+                                    }
+                                    if (realConnect == "RealConnection-up") {
+                                    }
+                                    else if (realConnect == "RealConnection-right") {
+                                    }
+                                    else if (realConnect == "RealConnection-left") {
+                                    }
+                                    else {
+                                        realCount(child);
+                                    }
+                                    break;
+                                case "90":
+                                    if (realConnect == "RealConnection-down") {
+                                        realConnectDown(child, realConnect);
+                                    }
+                                    if (realConnect == "RealConnection-up") {
+                                        realConnectUp(child, realConnect);
+                                    }
+                                    if (realConnect == "RealConnection-right") {
+                                        realConnectRight(child, realConnect);
+                                    }
+                                    if (realConnect == "RealConnection-down") {
+                                    }
+                                    else if (realConnect == "RealConnection-up") {
+                                    }
+                                    else if (realConnect == "RealConnection-right") {
+                                    }
+                                    else {
+                                        realCount(child);
+                                    }
+                                    break;
+                                case "180":
+                                    if (realConnect == "RealConnection-down") {
+                                        realConnectDown(child, realConnect);
+                                    }
+                                    if (realConnect == "RealConnection-right") {
+                                        realConnectRight(child, realConnect);
+                                    }
+                                    if (realConnect == "RealConnection-left") {
+                                        realConnectLeft(child, realConnect);
+                                    }
+                                    if (realConnect == "RealConnection-up") {
+                                        realCount(child);
+                                    }
+                                    break;
+
+                                case "270":
+                                    if (realConnect == "RealConnection-down") {
+                                        realConnectDown(child, realConnect);
+                                    }
+                                    if (realConnect == "RealConnection-up") {
+                                        realConnectUp(child, realConnect);
+                                    }
+                                    if (realConnect == "RealConnection-left") {
+                                        realConnectLeft(child, realConnect);
+                                    }
+                                    if (realConnect == "RealConnection-right") {
+                                        realCount(child);
+                                    }
+                                    break;
+                            }
+                            break;
+                        case "wireCross":
+                            switch (child.getAttribute("rotation")) {
+                                case "0":
+                                case "90":
+                                case "180":
+                                case "270":
+                                    if (realConnect == "RealConnection-down") {
+                                        realConnectDown(child, realConnect);
+                                    }
+                                    if (realConnect == "RealConnection-up") {
+                                        realConnectUp(child, realConnect);
+                                    }
+                                    if (realConnect == "RealConnection-left") {
+                                        realConnectLeft(child, realConnect);
+                                    }
+                                    if (realConnect == "RealConnection-right") {
+                                        realConnectRight(child, realConnect);
+                                    }
+                                    break
+                            }
+
                         default:
                             break;
                     }
-
+                    console.log(child.getAttribute("realConnection-count"))
+                }
+                else {
                 }
             }
 
@@ -301,7 +484,26 @@ document.addEventListener(`DOMContentLoaded`, () => {
         realConnectionsDetector();
     }
 
+    function realCount(child) {
+        switch (child.getAttribute("realConnection-count")) {
+            case "RealConnection-left":
+                document.getElementById(`post${Number(child.getAttribute('data-x')) + 1}x-${Number(child.getAttribute('data-y'))}y`).setAttribute(child.getAttribute("realConnection-count"), false);
+                break;
+            case "RealConnection-right":
+                document.getElementById(`post${Number(child.getAttribute('data-x')) - 1}x-${Number(child.getAttribute('data-y'))}y`).setAttribute(child.getAttribute("realConnection-count"), false);
+                break;
+            case "RealConnection-up":
+                document.getElementById(`post${Number(child.getAttribute('data-x'))}x-${Number(child.getAttribute('data-y')) - 1}y`).setAttribute(child.getAttribute("realConnection-count"), false);
+                break;
+            case "RealConnection-down":
+                document.getElementById(`post${Number(child.getAttribute('data-x'))}x-${Number(child.getAttribute('data-y')) + 1}y`).setAttribute(child.getAttribute("realConnection-count"), false);
+                break;
+            default:
+                break;
 
+        }
+        child.setAttribute("realConnection-count", 0)
+    }
 });
 
 function moveInteract(item, restrictionIs) {
