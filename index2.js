@@ -159,7 +159,7 @@ document.addEventListener(`DOMContentLoaded`, () => {
                             event.relatedTarget.setAttribute('listenerForClick', false);
                             event.relatedTarget.addEventListener("click", (event) => {
                                 if (event.detail === 1) {
-                                    console.log("clickiiiy", event ,event.target.parentNode )
+                                    console.log("clickiiiy", event, event.target.parentNode)
                                     switch (event.target.id) {
                                         case "resistor":
                                             updateResistor(event.target);
@@ -175,7 +175,7 @@ document.addEventListener(`DOMContentLoaded`, () => {
                                             document.getElementById("aside").innerHTML =
                                                 `
                                                 <h3>${event.target.id.toUpperCase()}</h3>
-                                                <p>Actual current: ${event.target.parentNode.getAttribute("current") || "none"}</p>
+                                                <p>Actual current (I): ${event.target.parentNode.getAttribute("current") || "none"}</p>
                                                 `
                                             break;
                                         case "resistor":
@@ -261,7 +261,7 @@ document.addEventListener(`DOMContentLoaded`, () => {
                         connectionsDetectorAnti();
                         realConnectionsDetectorAnti();
                         deleteCurrent();
-                        
+
                         circuitsDetector();
 
                     }
@@ -269,16 +269,16 @@ document.addEventListener(`DOMContentLoaded`, () => {
             });
 
     }
-    function updateResistor(target){
+    function updateResistor(target) {
         document.getElementById("aside").innerHTML =
-        `
+            `
         <h3>${target.id.toUpperCase()}</h3>
-        <p>Actual resistance: ${target.parentNode.getAttribute("resistance")}</p>
+        <p>Actual resistance (Ω): ${target.parentNode.getAttribute("resistance")}</p>
         <input type="text" placeholder="Resistance" id="input${target.parentNode.getAttribute("data-x")}-${target.parentNode.getAttribute("data-y")}">
         `
         document.getElementById(`input${target.parentNode.getAttribute("data-x")}-${target.parentNode.getAttribute("data-y")}`).setAttribute("data-x", target.parentNode.getAttribute("data-x"))
-        document.getElementById(`input${target.parentNode.getAttribute("data-x")}-${target.parentNode.getAttribute("data-y")}`).setAttribute("data-y", target.parentNode.getAttribute("data-y")) 
- 
+        document.getElementById(`input${target.parentNode.getAttribute("data-x")}-${target.parentNode.getAttribute("data-y")}`).setAttribute("data-y", target.parentNode.getAttribute("data-y"))
+
         document.getElementById(`input${target.parentNode.getAttribute("data-x")}-${target.parentNode.getAttribute("data-y")}`).addEventListener("change", (event) => {
             console.log(event.target.value, document.getElementById(`post${event.target.getAttribute("data-x")}x-${event.target.getAttribute("data-y")}y`))
             document.getElementById(`post${event.target.getAttribute("data-x")}x-${event.target.getAttribute("data-y")}y`).setAttribute("resistance", event.target.value);
@@ -287,16 +287,16 @@ document.addEventListener(`DOMContentLoaded`, () => {
         });
 
     }
-    function updateBattery(target){
+    function updateBattery(target) {
         document.getElementById("aside").innerHTML =
-        `
+            `
         <h3>${target.id.toUpperCase()}</h3>
-        <p>Actual voltage: ${target.parentNode.getAttribute("voltage")}</p>
+        <p>Actual voltage (V): ${target.parentNode.getAttribute("voltage")}</p>
         <input type="text" placeholder="Volts" id="input${target.parentNode.getAttribute("data-x")}-${target.parentNode.getAttribute("data-y")}">
         `
 
         document.getElementById(`input${target.parentNode.getAttribute("data-x")}-${target.parentNode.getAttribute("data-y")}`).setAttribute("data-x", target.parentNode.getAttribute("data-x"))
-        document.getElementById(`input${target.parentNode.getAttribute("data-x")}-${target.parentNode.getAttribute("data-y")}`).setAttribute("data-y", target.parentNode.getAttribute("data-y")) 
+        document.getElementById(`input${target.parentNode.getAttribute("data-x")}-${target.parentNode.getAttribute("data-y")}`).setAttribute("data-y", target.parentNode.getAttribute("data-y"))
 
         document.getElementById(`input${target.parentNode.getAttribute("data-x")}-${target.parentNode.getAttribute("data-y")}`).addEventListener("change", (event) => {
             document.getElementById(`post${event.target.getAttribute("data-x")}x-${event.target.getAttribute("data-y")}y`).setAttribute("voltage", event.target.value);
@@ -325,8 +325,11 @@ document.addEventListener(`DOMContentLoaded`, () => {
     }
     let RealConnectArr = ["RealConnection-left", "RealConnection-right", "RealConnection-up", "RealConnection-down"]
     let circuitsArray = [];
+    let timesSepar = 0;
+
     function circuitsDetector() {
         circuitsArray = [];
+        timesSepar = 0;
         for (const div of document.getElementById("circuits").children) {
             if (div.getAttribute("connectiontype") == "battery") {
                 console.log("batteryFOunded", div)
@@ -336,6 +339,7 @@ document.addEventListener(`DOMContentLoaded`, () => {
         }
     }
     function repetionCircuits(div, comming) {
+        console.log(timesSepar)
         console.log(circuitsArray, div)
         switch (div.getAttribute("connectiontype")) {
             case "wire":
@@ -352,7 +356,6 @@ document.addEventListener(`DOMContentLoaded`, () => {
                 case "wireCross":
                 case "wireT":
                 case "wireCurve":
-                    div.setAttribute("inTheCircuit", true)
                     repetionCircuits(element, "RealConnection-right");
                     break;
                 case "resistor":
@@ -377,21 +380,21 @@ document.addEventListener(`DOMContentLoaded`, () => {
             if (div.getAttribute(connection) == "true") {
                 console.log(connection, "exists")
                 if (connection == "RealConnection-left") {
-                    repeatLeft(div , comming, connection);
+                    repeatLeft(div, comming, connection);
                 }
                 if (connection == "RealConnection-right") {
-                    repeatRight(div , comming, connection);
+                    repeatRight(div, comming, connection);
                 }
                 if (connection == "RealConnection-up") {
-                    repeatUp(div , comming, connection);
+                    repeatUp(div, comming, connection);
                 }
                 if (connection == "RealConnection-down") {
-                    repeatDown(div , comming, connection);
+                    repeatDown(div, comming, connection);
                 }
             }
         }
     }
-    function repeatLeft(div , comming, connection){
+    function repeatLeft(div, comming, connection) {
         console.log(comming == connection);
         if (comming == connection) {
             return
@@ -401,13 +404,26 @@ document.addEventListener(`DOMContentLoaded`, () => {
         switch (element1.getAttribute("connectiontype")) {
             case "wire":
             case "wireCross":
-            case "wireT":
-            case "wireCurve":
                 repetionCircuits(element1, "RealConnection-right");
                 break;
+            case "wireT":
+            case "wireCurve":
+                if (timesSepar >= 3) {
+                    return
+                }
+                repetionCircuits(element1, "RealConnection-right");
+                timesSepar = timesSepar + 1;
+                console.log("happendsssss", timesSepar)
+                break
             case "resistor":
                 console.log("resistor")
-                circuitsArray.push({ resistance: Number(element1.getAttribute("resistance")) })
+                if (timesSepar >= 1 && timesSepar < 3) {// this is killing on the resistor after a parallel circuit :c
+                    circuitsArray.push({ resistanceOnLoop: Number(element1.getAttribute("resistance")) })
+                }
+                else {
+                    circuitsArray.push({ resistance: Number(element1.getAttribute("resistance")) })
+                }
+
                 repetionCircuits(element1, "RealConnection-right");
                 break;
             case "battery":
@@ -421,7 +437,7 @@ document.addEventListener(`DOMContentLoaded`, () => {
                 break;
         }
     }
-    function repeatRight(div , comming, connection){
+    function repeatRight(div, comming, connection) {
         console.log(comming == connection);
 
         if (comming == connection) {
@@ -432,14 +448,29 @@ document.addEventListener(`DOMContentLoaded`, () => {
         switch (element2.getAttribute("connectiontype")) {
             case "wire":
             case "wireCross":
-            case "wireT":
-            case "wireCurve":
                 repetionCircuits(element2, "RealConnection-left");
                 break;
+            case "wireT":
+            case "wireCurve":
+
+                if (timesSepar >= 3) {
+                    return
+                }
+                repetionCircuits(element2, "RealConnection-left");
+                timesSepar = timesSepar + 1;
+                console.log("happendsssss", timesSepar)
+
+                break
+
             case "resistor":
                 console.log("resistor")
 
-                circuitsArray.push({ resistance: Number(element2.getAttribute("resistance")) })
+                if (timesSepar >= 1 && timesSepar < 3) {// this is killing on the resistor after a parallel circuit :c
+                    circuitsArray.push({ resistanceOnLoop: Number(element2.getAttribute("resistance")) })
+                }
+                else {
+                    circuitsArray.push({ resistance: Number(element2.getAttribute("resistance")) })
+                }
                 repetionCircuits(element2, "RealConnection-left");
                 break;
             case "battery":
@@ -453,7 +484,7 @@ document.addEventListener(`DOMContentLoaded`, () => {
                 break;
         }
     }
-    function repeatUp(div , comming, connection){
+    function repeatUp(div, comming, connection) {
         console.log(comming == connection);
 
         if (comming == connection) {
@@ -465,14 +496,29 @@ document.addEventListener(`DOMContentLoaded`, () => {
         switch (element3.getAttribute("connectiontype")) {
             case "wire":
             case "wireCross":
-            case "wireT":
-            case "wireCurve":
                 repetionCircuits(element3, "RealConnection-down");
                 break;
+            case "wireT":
+            case "wireCurve":
+
+                if (timesSepar >= 3) {
+                    return
+                }
+                repetionCircuits(element3, "RealConnection-down");
+
+                timesSepar = timesSepar + 1;
+                console.log("happendsssss", timesSepar)
+
+                break
             case "resistor":
                 console.log("resistor")
 
-                circuitsArray.push({ resistance: Number(element3.getAttribute("resistance")) })
+                if (timesSepar >= 1 && timesSepar < 3) {// this is killing on the resistor after a parallel circuit :c
+                    circuitsArray.push({ resistanceOnLoop: Number(element3.getAttribute("resistance")) })
+                }
+                else {
+                    circuitsArray.push({ resistance: Number(element3.getAttribute("resistance")) })
+                }
                 repetionCircuits(element3, "RealConnection-down");
                 break;
             case "battery":
@@ -488,7 +534,7 @@ document.addEventListener(`DOMContentLoaded`, () => {
         }
 
     }
-    function repeatDown(div , comming, connection){
+    function repeatDown(div, comming, connection) {
         console.log(comming == connection);
         if (comming == connection) {
             return
@@ -499,14 +545,30 @@ document.addEventListener(`DOMContentLoaded`, () => {
         switch (element4.getAttribute("connectiontype")) {
             case "wire":
             case "wireCross":
-            case "wireT":
-            case "wireCurve":
                 repetionCircuits(element4, "RealConnection-up");
                 break;
+            case "wireT":
+            case "wireCurve":
+
+                if (timesSepar >= 3) {
+                    return
+                }
+                repetionCircuits(element4, "RealConnection-up");
+
+                timesSepar = timesSepar + 1;
+                console.log("happendsssss", timesSepar)
+
+                break
+
             case "resistor":
                 console.log("resistor")
 
-                circuitsArray.push({ resistance: Number(element4.getAttribute("resistance")) })
+                if (timesSepar >= 1 && timesSepar < 3) {// this is killing on the resistor after a parallel circuit :c
+                    circuitsArray.push({ resistanceOnLoop: Number(element4.getAttribute("resistance")) })
+                }
+                else {
+                    circuitsArray.push({ resistance: Number(element4.getAttribute("resistance")) })
+                }
                 repetionCircuits(element4, "RealConnection-up");
                 break;
             case "battery":
@@ -523,12 +585,12 @@ document.addEventListener(`DOMContentLoaded`, () => {
 
     }
     // circuitsArray = [{voltage : 2}, {resistance: 4  }]
-    function analizeCircuit(){
+    function analizeCircuit() {
         let voltage = 0;
         let resistance = 0;
 
         for (const circuitElement of circuitsArray) {
-            console.log(Object.keys(circuitElement), circuitElement, "caca", Object.keys(circuitElement) == "resistance"    )
+            console.log(Object.keys(circuitElement), circuitElement, "caca", Object.keys(circuitElement) == "resistance")
             switch (Object.keys(circuitElement)[0]) {
                 case "voltage":
                     console.log("adding volts")
@@ -546,23 +608,23 @@ document.addEventListener(`DOMContentLoaded`, () => {
 
         }
 
-        let current = voltage/resistance;
+        let current = voltage / resistance;
         console.log(current, voltage, resistance)
 
         updateCurrentValue(current)
     }
 
-    function updateCurrentValue(current){
+    function updateCurrentValue(current) {
         for (const div of document.getElementById("circuits").children) {
-            if (div.getAttribute("connectiontype").substring(0,4) == "wire" && div.getAttribute("inTheCircuit") == "true") {
+            if (div.getAttribute("connectiontype").substring(0, 4) == "wire" && div.getAttribute("inTheCircuit") == "true") {
                 console.log(div.getAttribute("connectiontype"))
                 div.setAttribute("current", current)
             }
         }
     }
-    function deleteCurrent(){
+    function deleteCurrent() {
         for (const div of document.getElementById("circuits").children) {
-            if (div.getAttribute("connectiontype").substring(0,4) == "wire") {
+            if (div.getAttribute("connectiontype").substring(0, 4) == "wire") {
                 div.setAttribute("current", "none")
             }
         }
