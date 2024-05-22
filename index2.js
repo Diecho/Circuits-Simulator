@@ -162,10 +162,10 @@ document.addEventListener(`DOMContentLoaded`, () => {
                                     console.log("clickiiiy", event ,event.target.parentNode )
                                     switch (event.target.id) {
                                         case "resistor":
-                                            updateResistor();
+                                            updateResistor(event.target);
                                             break;
                                         case "battery":
-                                            updateBattery();
+                                            updateBattery(event.target);
                                             break;
                                         case "wire":
                                         case "wireCross":
@@ -269,28 +269,39 @@ document.addEventListener(`DOMContentLoaded`, () => {
             });
 
     }
-    function updateResistor(){
+    function updateResistor(target){
         document.getElementById("aside").innerHTML =
         `
-        <h3>${event.target.id.toUpperCase()}</h3>
-        <p>Actual resistance: ${event.target.parentNode.getAttribute("resistance")}</p>
-        <input type="text" placeholder="Resistance" id="input${event.target.parentNode.getAttribute("data-x")}-${event.target.parentNode.getAttribute("data-y")}">
+        <h3>${target.id.toUpperCase()}</h3>
+        <p>Actual resistance: ${target.parentNode.getAttribute("resistance")}</p>
+        <input type="text" placeholder="Resistance" id="input${target.parentNode.getAttribute("data-x")}-${target.parentNode.getAttribute("data-y")}">
         `
-        // document.getElementById(`input${event.target.parentNode.getAttribute("data-x")}-${event.target.parentNode.getAttribute("data-y")}`).setAttribute("data=x") working here
-        document.getElementById(`input${event.target.parentNode.getAttribute("data-x")}-${event.target.parentNode.getAttribute("data-y")}`).addEventListener("change", (event) => {
-            console.log(event, event.target.value)
+        document.getElementById(`input${target.parentNode.getAttribute("data-x")}-${target.parentNode.getAttribute("data-y")}`).setAttribute("data-x", target.parentNode.getAttribute("data-x"))
+        document.getElementById(`input${target.parentNode.getAttribute("data-x")}-${target.parentNode.getAttribute("data-y")}`).setAttribute("data-y", target.parentNode.getAttribute("data-y")) 
+ 
+        document.getElementById(`input${target.parentNode.getAttribute("data-x")}-${target.parentNode.getAttribute("data-y")}`).addEventListener("change", (event) => {
+            console.log(event.target.value, document.getElementById(`post${event.target.getAttribute("data-x")}x-${event.target.getAttribute("data-y")}y`))
+            document.getElementById(`post${event.target.getAttribute("data-x")}x-${event.target.getAttribute("data-y")}y`).setAttribute("resistance", event.target.value);
+            updateResistor(document.querySelector(`#post${event.target.getAttribute("data-x")}x-${event.target.getAttribute("data-y")}y img`));
+            circuitsDetector();
         });
 
     }
-    function updateBattery(){
+    function updateBattery(target){
         document.getElementById("aside").innerHTML =
         `
-        <h3>${event.target.id.toUpperCase()}</h3>
-        <p>Actual voltage: ${event.target.parentNode.getAttribute("voltage")}</p>
-        <input type="text" placeholder="Volts" id="input${event.target.parentNode.getAttribute("data-x")}-${event.target.parentNode.getAttribute("data-y")}">
+        <h3>${target.id.toUpperCase()}</h3>
+        <p>Actual voltage: ${target.parentNode.getAttribute("voltage")}</p>
+        <input type="text" placeholder="Volts" id="input${target.parentNode.getAttribute("data-x")}-${target.parentNode.getAttribute("data-y")}">
         `
-        document.getElementById(`input${event.target.parentNode.getAttribute("data-x")}-${event.target.parentNode.getAttribute("data-y")}`).addEventListener("change", (event) => {
 
+        document.getElementById(`input${target.parentNode.getAttribute("data-x")}-${target.parentNode.getAttribute("data-y")}`).setAttribute("data-x", target.parentNode.getAttribute("data-x"))
+        document.getElementById(`input${target.parentNode.getAttribute("data-x")}-${target.parentNode.getAttribute("data-y")}`).setAttribute("data-y", target.parentNode.getAttribute("data-y")) 
+
+        document.getElementById(`input${target.parentNode.getAttribute("data-x")}-${target.parentNode.getAttribute("data-y")}`).addEventListener("change", (event) => {
+            document.getElementById(`post${event.target.getAttribute("data-x")}x-${event.target.getAttribute("data-y")}y`).setAttribute("voltage", event.target.value);
+            updateBattery(document.querySelector(`#post${event.target.getAttribute("data-x")}x-${event.target.getAttribute("data-y")}y img`));
+            circuitsDetector();
         });
     }
     let ConnectArr = ["connection-left", "connection-right", "connection-up", "connection-down"]
