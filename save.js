@@ -102,3 +102,107 @@ function getDragAngle(event) {
 
     return angle - startAngle;
 }
+
+
+
+switch (connection) {
+    case "RealConnection-left":
+        console.log(comming == connection);
+        if (comming == connection) {
+            return
+        }
+        let element1 = document.getElementById(`post${Number(div.getAttribute('data-x')) - 1}x-${Number(div.getAttribute('data-y'))}y`);
+        switch (element1.getAttribute("connectiontype")) {
+            case "wire":
+            case "wireCross":
+            case "wireT":
+            case "wireCurve":
+                repetionCircuits(element1, "RealConnection-right");
+                break;
+            case "resistor":
+                console.log("resistor")
+                circuitsArray.push({ resistance: Number(element1.getAttribute("resistance")) })
+                repetionCircuits(element1, "RealConnection-right");
+                break;
+            case "battery":
+                return
+            default:
+                break;
+        }
+        break;
+    case "RealConnection-right":
+        if (comming == connection) {
+            return
+        }
+        let element2 = document.getElementById(`post${Number(div.getAttribute('data-x')) + 1}x-${Number(div.getAttribute('data-y'))}y`);
+        switch (element2.getAttribute("connectiontype")) {
+            case "wire":
+            case "wireCross":
+            case "wireT":
+            case "wireCurve":
+                repetionCircuits(element2, "RealConnection-left");
+                break;
+            case "resistor":
+                console.log("resistor")
+
+                circuitsArray.push({ resistance: Number(element2.getAttribute("resistance")) })
+                repetionCircuits(element2, "RealConnection-left");
+                break;
+            case "battery":
+                return
+            default:
+                break;
+        }
+        break;
+    case "RealConnection-up":
+        if (comming == connection) {
+            return
+        }
+        let element3 = document.getElementById(`post${Number(div.getAttribute('data-x'))}x-${Number(div.getAttribute('data-y')) + 1}}y`);
+        switch (element3.getAttribute("connectiontype")) {
+            case "wire":
+            case "wireCross":
+            case "wireT":
+            case "wireCurve":
+                repetionCircuits(element3, "RealConnection-down");
+                break;
+            case "resistor":
+                console.log("resistor")
+
+                circuitsArray.push({ resistance: Number(element3.getAttribute("resistance")) })
+                repetionCircuits(element3, "RealConnection-down");
+                break;
+            case "battery":
+                return
+
+            default:
+                break;
+        }
+        break;
+    case "RealConnection-down":
+        if (comming == connection) {
+            return
+        }
+        let element4 = document.getElementById(`post${Number(div.getAttribute('data-x'))}x-${Number(div.getAttribute('data-y')) - 1}}y`);
+        switch (element4.getAttribute("connectiontype")) {
+            case "wire":
+            case "wireCross":
+            case "wireT":
+            case "wireCurve":
+                repetionCircuits(element4, "RealConnection-up");
+                break;
+            case "resistor":
+                console.log("resistor")
+
+                circuitsArray.push({ resistance: Number(element4.getAttribute("resistance")) })
+                repetionCircuits(element4, "RealConnection-up");
+                break;
+            case "battery":
+                return
+
+            default:
+                break;
+        }
+        break;
+
+}
