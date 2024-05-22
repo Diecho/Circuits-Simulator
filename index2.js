@@ -159,25 +159,13 @@ document.addEventListener(`DOMContentLoaded`, () => {
                             event.relatedTarget.setAttribute('listenerForClick', false);
                             event.relatedTarget.addEventListener("click", (event) => {
                                 if (event.detail === 1) {
-                                    console.log("clickiiiy", event)
+                                    console.log("clickiiiy", event ,event.target.parentNode )
                                     switch (event.target.id) {
                                         case "resistor":
-                                            document.getElementById("aside").innerHTML =
-                                                `
-                                                <h3>${event.target.id.toUpperCase()}</h3>
-                                                <p>Actual resistance: ${event.target.parentNode.getAttribute("resistance")}</p>
-                                                <input type="text" placeholder="Resistance">
-                                                <button id="change">Change</button>                                
-                                                `
+                                            updateResistor();
                                             break;
                                         case "battery":
-                                            document.getElementById("aside").innerHTML =
-                                                `
-                                                <h3>${event.target.id.toUpperCase()}</h3>
-                                                <p>Actual voltage: ${event.target.parentNode.getAttribute("voltage")}</p>
-                                                <input type="text" placeholder="Volts">
-                                                <button id="change">Change</button>                                
-                                                `
+                                            updateBattery();
                                             break;
                                         case "wire":
                                         case "wireCross":
@@ -215,7 +203,6 @@ document.addEventListener(`DOMContentLoaded`, () => {
 
                         if (!(event.currentTarget.getAttribute('circuitsDetect') == "false")) {
                             event.currentTarget.setAttribute('circuitsDetect', false);
-
                             circuitsDetector();
                         }
                     }
@@ -268,17 +255,43 @@ document.addEventListener(`DOMContentLoaded`, () => {
                             console.log("desconected")
                         }
                         event.target.parentNode.setAttribute("realConnection-count", 0)
-                        event.target.parentNode.setAttribute('circuitsDetect', true);
+                        event.currentTarget.setAttribute('circuitsDetect', true);
                         event.target.parentNode.setAttribute("inTheCircuit", false)
 
                         connectionsDetectorAnti();
                         realConnectionsDetectorAnti();
+                        deleteCurrent();
+                        
                         circuitsDetector();
 
                     }
                 }
             });
 
+    }
+    function updateResistor(){
+        document.getElementById("aside").innerHTML =
+        `
+        <h3>${event.target.id.toUpperCase()}</h3>
+        <p>Actual resistance: ${event.target.parentNode.getAttribute("resistance")}</p>
+        <input type="text" placeholder="Resistance" id="input${event.target.parentNode.getAttribute("data-x")}-${event.target.parentNode.getAttribute("data-y")}">
+        `
+        // document.getElementById(`input${event.target.parentNode.getAttribute("data-x")}-${event.target.parentNode.getAttribute("data-y")}`).setAttribute("data=x") working here
+        document.getElementById(`input${event.target.parentNode.getAttribute("data-x")}-${event.target.parentNode.getAttribute("data-y")}`).addEventListener("change", (event) => {
+            console.log(event, event.target.value)
+        });
+
+    }
+    function updateBattery(){
+        document.getElementById("aside").innerHTML =
+        `
+        <h3>${event.target.id.toUpperCase()}</h3>
+        <p>Actual voltage: ${event.target.parentNode.getAttribute("voltage")}</p>
+        <input type="text" placeholder="Volts" id="input${event.target.parentNode.getAttribute("data-x")}-${event.target.parentNode.getAttribute("data-y")}">
+        `
+        document.getElementById(`input${event.target.parentNode.getAttribute("data-x")}-${event.target.parentNode.getAttribute("data-y")}`).addEventListener("change", (event) => {
+
+        });
     }
     let ConnectArr = ["connection-left", "connection-right", "connection-up", "connection-down"]
     function connectionsDetector() {
@@ -313,6 +326,14 @@ document.addEventListener(`DOMContentLoaded`, () => {
     }
     function repetionCircuits(div, comming) {
         console.log(circuitsArray, div)
+        switch (div.getAttribute("connectiontype")) {
+            case "wire":
+            case "wireCross":
+            case "wireT":
+            case "wireCurve":
+                div.setAttribute("inTheCircuit", true);
+                break
+        }
         if (div.getAttribute("connectiontype") == "battery") {
             let element = document.getElementById(`post${Number(div.getAttribute('data-x')) - 1}x-${Number(div.getAttribute('data-y'))}y`);
             switch (element.getAttribute("connectiontype")) {
@@ -371,7 +392,6 @@ document.addEventListener(`DOMContentLoaded`, () => {
             case "wireCross":
             case "wireT":
             case "wireCurve":
-                div.setAttribute("inTheCircuit", true)
                 repetionCircuits(element1, "RealConnection-right");
                 break;
             case "resistor":
@@ -403,7 +423,6 @@ document.addEventListener(`DOMContentLoaded`, () => {
             case "wireCross":
             case "wireT":
             case "wireCurve":
-                div.setAttribute("inTheCircuit", true)
                 repetionCircuits(element2, "RealConnection-left");
                 break;
             case "resistor":
@@ -437,7 +456,6 @@ document.addEventListener(`DOMContentLoaded`, () => {
             case "wireCross":
             case "wireT":
             case "wireCurve":
-                div.setAttribute("inTheCircuit", true)
                 repetionCircuits(element3, "RealConnection-down");
                 break;
             case "resistor":
@@ -472,7 +490,6 @@ document.addEventListener(`DOMContentLoaded`, () => {
             case "wireCross":
             case "wireT":
             case "wireCurve":
-                div.setAttribute("inTheCircuit", true)
                 repetionCircuits(element4, "RealConnection-up");
                 break;
             case "resistor":
@@ -529,6 +546,13 @@ document.addEventListener(`DOMContentLoaded`, () => {
             if (div.getAttribute("connectiontype").substring(0,4) == "wire" && div.getAttribute("inTheCircuit") == "true") {
                 console.log(div.getAttribute("connectiontype"))
                 div.setAttribute("current", current)
+            }
+        }
+    }
+    function deleteCurrent(){
+        for (const div of document.getElementById("circuits").children) {
+            if (div.getAttribute("connectiontype").substring(0,4) == "wire") {
+                div.setAttribute("current", "none")
             }
         }
     }
