@@ -41,6 +41,8 @@ document.addEventListener(`DOMContentLoaded`, () => {
         document.getElementById(`post${position.x}x-${position.y}y`).setAttribute("RealConnection-left", false)
         document.getElementById(`post${position.x}x-${position.y}y`).setAttribute("RealConnection-left", false)
         document.getElementById(`post${position.x}x-${position.y}y`).setAttribute("realConnection-count", 0)
+        document.getElementById(`post${position.x}x-${position.y}y`).setAttribute("inTheCircuit", false)
+        document.getElementById(`post${position.x}x-${position.y}y`).setAttribute('circuitsDetect', true);
 
 
     }
@@ -205,23 +207,17 @@ document.addEventListener(`DOMContentLoaded`, () => {
 
 
                                 }
-
-
-
                             });
                         }
 
                         realConnectionsAdd(event.currentTarget);
+                        // circuitsDetector(); //fix here
 
                         if (!(event.currentTarget.getAttribute('circuitsDetect') == "false")) {
                             event.currentTarget.setAttribute('circuitsDetect', false);
 
                             circuitsDetector();
                         }
-
-
-
-
                     }
                 },
                 ondragenter: function (event) {
@@ -273,6 +269,7 @@ document.addEventListener(`DOMContentLoaded`, () => {
                         }
                         event.target.parentNode.setAttribute("realConnection-count", 0)
                         event.target.parentNode.setAttribute('circuitsDetect', true);
+                        event.target.parentNode.setAttribute("inTheCircuit", false)
 
                         connectionsDetectorAnti();
                         realConnectionsDetectorAnti();
@@ -308,8 +305,8 @@ document.addEventListener(`DOMContentLoaded`, () => {
         circuitsArray = [];
         for (const div of document.getElementById("circuits").children) {
             if (div.getAttribute("connectiontype") == "battery") {
-                console.log("batteryFOunded")
-                circuitsArray.push({ battery: Number(div.getAttribute("voltage")) })
+                console.log("batteryFOunded", div)
+                circuitsArray.push({ voltage: Number(div.getAttribute("voltage")) })
                 repetionCircuits(div)
             }
         }
@@ -323,6 +320,7 @@ document.addEventListener(`DOMContentLoaded`, () => {
                 case "wireCross":
                 case "wireT":
                 case "wireCurve":
+                    div.setAttribute("inTheCircuit", true)
                     repetionCircuits(element, "RealConnection-right");
                     break;
                 case "resistor":
@@ -331,6 +329,8 @@ document.addEventListener(`DOMContentLoaded`, () => {
                     repetionCircuits(element, "RealConnection-right");
                     break;
                 case "battery":
+                    console.log("baterry")
+                    analizeCircuit();
                 case "none":
                     console.log("ended")
                     return
@@ -339,129 +339,199 @@ document.addEventListener(`DOMContentLoaded`, () => {
             }
             return
         }
-        for (const connection of RealConnectArr) {
-            if (div.getAttribute(connection) == "true") {
-                console.log(connection)
-                if (connection == "RealConnection-left") {
-                    console.log(comming == connection);
-                    if (comming == connection) {
-                        return
-                    }
-                    let element1 = document.getElementById(`post${Number(div.getAttribute('data-x')) - 1}x-${Number(div.getAttribute('data-y'))}y`);
-                    switch (element1.getAttribute("connectiontype")) {
-                        case "wire":
-                        case "wireCross":
-                        case "wireT":
-                        case "wireCurve":
-                            repetionCircuits(element1, "RealConnection-right");
-                            break;
-                        case "resistor":
-                            console.log("resistor")
-                            circuitsArray.push({ resistance: Number(element1.getAttribute("resistance")) })
-                            repetionCircuits(element1, "RealConnection-right");
-                            break;
-                        case "battery":
-                        case "none":
-                            console.log("ended")
 
-                            return
-                        default:
-                            break;
-                    }
+        for (const connection of RealConnectArr) {
+            console.log(connection)
+            if (div.getAttribute(connection) == "true") {
+                console.log(connection, "exists")
+                if (connection == "RealConnection-left") {
+                    repeatLeft(div , comming, connection);
                 }
                 if (connection == "RealConnection-right") {
-                    if (comming == connection) {
-                        return
-                    }
-                    let element2 = document.getElementById(`post${Number(div.getAttribute('data-x')) + 1}x-${Number(div.getAttribute('data-y'))}y`);
-                    switch (element2.getAttribute("connectiontype")) {
-                        case "wire":
-                        case "wireCross":
-                        case "wireT":
-                        case "wireCurve":
-                            repetionCircuits(element2, "RealConnection-left");
-                            break;
-                        case "resistor":
-                            console.log("resistor")
-
-                            circuitsArray.push({ resistance: Number(element2.getAttribute("resistance")) })
-                            repetionCircuits(element2, "RealConnection-left");
-                            break;
-                        case "battery":
-                        case "none":
-                            console.log("ended")
-
-                            return
-                        default:
-                            break;
-                    }
+                    repeatRight(div , comming, connection);
                 }
                 if (connection == "RealConnection-up") {
-                    if (comming == connection) {
-                        return
-                    }
-                    let element3 = document.getElementById(`post${Number(div.getAttribute('data-x'))}x-${Number(div.getAttribute('data-y')) + 1}}y`);
-                    switch (element3.getAttribute("connectiontype")) {
-                        case "wire":
-                        case "wireCross":
-                        case "wireT":
-                        case "wireCurve":
-                            repetionCircuits(element3, "RealConnection-down");
-                            break;
-                        case "resistor":
-                            console.log("resistor")
-
-                            circuitsArray.push({ resistance: Number(element3.getAttribute("resistance")) })
-                            repetionCircuits(element3, "RealConnection-down");
-                            break;
-                        case "battery":
-                        case "none":
-                            console.log("ended")
-
-                            return
-
-                        default:
-                            break;
-                    }
+                    repeatUp(div , comming, connection);
                 }
                 if (connection == "RealConnection-down") {
-                    if (comming == connection) {
-                        return
-                    }
-                    let element4 = document.getElementById(`post${Number(div.getAttribute('data-x'))}x-${Number(div.getAttribute('data-y')) - 1}}y`);
-                    switch (element4.getAttribute("connectiontype")) {
-                        case "wire":
-                        case "wireCross":
-                        case "wireT":
-                        case "wireCurve":
-                            repetionCircuits(element4, "RealConnection-up");
-                            break;
-                        case "resistor":
-                            console.log("resistor")
-
-                            circuitsArray.push({ resistance: Number(element4.getAttribute("resistance")) })
-                            repetionCircuits(element4, "RealConnection-up");
-                            break;
-                        case "battery":
-                        case "none":
-                            console.log("ended")
-
-                            return
-
-                        default:
-                            break;
-                    }
+                    repeatDown(div , comming, connection);
                 }
-
             }
         }
+    }
+    function repeatLeft(div , comming, connection){
+        console.log(comming == connection);
+        if (comming == connection) {
+            return
+        }
+        console.log(connection, "worked")
+        let element1 = document.getElementById(`post${Number(div.getAttribute('data-x')) - 1}x-${Number(div.getAttribute('data-y'))}y`);
+        switch (element1.getAttribute("connectiontype")) {
+            case "wire":
+            case "wireCross":
+            case "wireT":
+            case "wireCurve":
+                div.setAttribute("inTheCircuit", true)
+                repetionCircuits(element1, "RealConnection-right");
+                break;
+            case "resistor":
+                console.log("resistor")
+                circuitsArray.push({ resistance: Number(element1.getAttribute("resistance")) })
+                repetionCircuits(element1, "RealConnection-right");
+                break;
+            case "battery":
+                console.log("baterry");
+                analizeCircuit();
+            case "none":
+                console.log("ended")
 
+                return
+            default:
+                break;
+        }
+    }
+    function repeatRight(div , comming, connection){
+        console.log(comming == connection);
+
+        if (comming == connection) {
+            return
+        }
+        console.log(connection, "worked")
+        let element2 = document.getElementById(`post${Number(div.getAttribute('data-x')) + 1}x-${Number(div.getAttribute('data-y'))}y`);
+        switch (element2.getAttribute("connectiontype")) {
+            case "wire":
+            case "wireCross":
+            case "wireT":
+            case "wireCurve":
+                div.setAttribute("inTheCircuit", true)
+                repetionCircuits(element2, "RealConnection-left");
+                break;
+            case "resistor":
+                console.log("resistor")
+
+                circuitsArray.push({ resistance: Number(element2.getAttribute("resistance")) })
+                repetionCircuits(element2, "RealConnection-left");
+                break;
+            case "battery":
+                analizeCircuit();
+                console.log("baterry")
+            case "none":
+                console.log("ended")
+
+                return
+            default:
+                break;
+        }
+    }
+    function repeatUp(div , comming, connection){
+        console.log(comming == connection);
+
+        if (comming == connection) {
+            return
+        }
+        console.log(connection, "worked")
+
+        let element3 = document.getElementById(`post${Number(div.getAttribute('data-x'))}x-${Number(div.getAttribute('data-y')) + 1}y`);
+        switch (element3.getAttribute("connectiontype")) {
+            case "wire":
+            case "wireCross":
+            case "wireT":
+            case "wireCurve":
+                div.setAttribute("inTheCircuit", true)
+                repetionCircuits(element3, "RealConnection-down");
+                break;
+            case "resistor":
+                console.log("resistor")
+
+                circuitsArray.push({ resistance: Number(element3.getAttribute("resistance")) })
+                repetionCircuits(element3, "RealConnection-down");
+                break;
+            case "battery":
+                console.log("baterry")
+                analizeCircuit();
+            case "none":
+                console.log("ended")
+
+                return
+
+            default:
+                break;
+        }
 
     }
+    function repeatDown(div , comming, connection){
+        console.log(comming == connection);
+        if (comming == connection) {
+            return
+        }
+        console.log(connection, "worked")
 
+        let element4 = document.getElementById(`post${Number(div.getAttribute('data-x'))}x-${Number(div.getAttribute('data-y')) - 1}y`);
+        switch (element4.getAttribute("connectiontype")) {
+            case "wire":
+            case "wireCross":
+            case "wireT":
+            case "wireCurve":
+                div.setAttribute("inTheCircuit", true)
+                repetionCircuits(element4, "RealConnection-up");
+                break;
+            case "resistor":
+                console.log("resistor")
 
+                circuitsArray.push({ resistance: Number(element4.getAttribute("resistance")) })
+                repetionCircuits(element4, "RealConnection-up");
+                break;
+            case "battery":
+                console.log("baterry")
+                analizeCircuit();
+            case "none":
+                console.log("ended")
 
+                return
 
+            default:
+                break;
+        }
+
+    }
+    // circuitsArray = [{voltage : 2}, {resistance: 4  }]
+    function analizeCircuit(){
+        let voltage = 0;
+        let resistance = 0;
+
+        for (const circuitElement of circuitsArray) {
+            console.log(Object.keys(circuitElement), circuitElement, "caca", Object.keys(circuitElement) == "resistance"    )
+            switch (Object.keys(circuitElement)[0]) {
+                case "voltage":
+                    console.log("adding volts")
+                    voltage = voltage + Object.values(circuitElement)[0]
+
+                    break;
+                case "resistance":
+                    console.log("adding resistance")
+
+                    resistance = resistance + Object.values(circuitElement)[0]
+                    break
+                default:
+                    break;
+            }
+
+        }
+
+        let current = voltage/resistance;
+        console.log(current, voltage, resistance)
+
+        updateCurrentValue(current)
+    }
+
+    function updateCurrentValue(current){
+        for (const div of document.getElementById("circuits").children) {
+            if (div.getAttribute("connectiontype").substring(0,4) == "wire" && div.getAttribute("inTheCircuit") == "true") {
+                console.log(div.getAttribute("connectiontype"))
+                div.setAttribute("current", current)
+            }
+        }
+    }
     function realConnectionsDetector() {
         for (const child of document.getElementById("circuits").children) {
             for (const iterator of RealConnectArr) {
