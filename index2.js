@@ -1,6 +1,12 @@
 
 document.addEventListener(`DOMContentLoaded`, () => {
+    document.getElementById("Instructions").addEventListener("click", ()=>{
+        
+        document.getElementById("reduce").classList.toggle("displayNone")
+        document.getElementById("imgDropDown").classList.toggle("inverse")
 
+        
+    });
     class Position {
         constructor(x, y) {
             this.x = x;

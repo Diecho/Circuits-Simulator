@@ -212,6 +212,18 @@ aside button{
 #article {
     width: 300px;
     height: 155px;
+    flex-direction: column;
+}
+#Instructions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#article span, #article span img {
+    height: 24px;
+}
+.inverse {
+    transform: rotate(180deg);
 }
 @media only screen and (max-width: 600px) {
 
